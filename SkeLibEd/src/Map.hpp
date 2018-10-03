@@ -68,37 +68,44 @@ public:
 
 		};
 
-		// ThreadMap - functionality of the Map pattern
+		// ThreadMap - function applied to each thread
 		// --------------------------------------------
+		//	THREADS[t] = new std::thread(&MapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, threadArguments, t, args...);
+		
 		template<typename IN, typename OUT, typename ...ARGs>
 		void threadMap(ThreadArgument<IN, OUT> *threadArguments, size_t threadID, ARGs... args) {
 
-			auto input = threadArguments[threadID].input;
-			auto output = threadArguments[threadID].output;
+			//auto k = new std::thread()
+			//auto input = threadArguments[threadID].input;
+			//auto output = threadArguments[threadID].output;
 
-			std::cout << "Thread here " << threadID << std::endl;
+			//std::cout << "Thread here " << threadID << std::endl;
 
+			// Assing the job of the current thread to assist itself
+			// -----------------------------------------------------
 			size_t assistedThreadID = threadID;
 			do {
 
-				std::mutex* dataBlockMutex = threadArguments[assistedThreadID].dataBlockMutex;
-				unsigned char* dataBlockFlags = threadArguments[assistedThreadID].dataBlockFlags;
-				std::size_t* dataBlockIndices = threadArguments[assistedThreadID].dataBlockIndices;
-				size_t nDataBlocks = threadArguments[assistedThreadID].nDataBlocks;
+				size_t			nDataBlocks		 = threadArguments[assistedThreadID].nDataBlocks;
+				std::mutex*		dataBlockMutex	 = threadArguments[assistedThreadID].dataBlockMutex;
+				unsigned char*	dataBlockFlags	 = threadArguments[assistedThreadID].dataBlockFlags;
+				std::size_t*	dataBlockIndices = threadArguments[assistedThreadID].dataBlockIndices;
 
 				size_t dataBlock = 0;
 
-				// why shouldn't we 'steal' even the first dataBlock? :P
+				// Starts to iterate over data blocks of given thread
+				// --------------------------------------------------
 				while (dataBlock < nDataBlocks) {
 
-					if (dataBlockFlags[dataBlock] == 0 // if the data block has been, or being processed by another thread...
-						|| dataBlockIndices[dataBlock] == dataBlockIndices[dataBlock + 1]) {
+					// Check for availability of a data block (no other thread is working on it)
+					// -------------------------------------------------------------------------
+					if (dataBlockFlags[dataBlock] == 0 || dataBlockIndices[dataBlock] == dataBlockIndices[dataBlock + 1]) {
 						++dataBlock;
-						continue; //as we iterate in reverse -> continue. In case there are no more dataBlocks, as chunkSize might be less than NDATABLOCKS
+						continue; // If block is being worked, current thread should jsut skip it 
 					}
 
 					dataBlockMutex->lock();
-					if (dataBlockFlags[dataBlock] == 1) { // were the flag is zero, the following flags are zero too.
+					if (dataBlockFlags[dataBlock] == 1) { // where the flag is zero, the following flags are zero too.
 						dataBlockFlags[dataBlock] = 0;
 						dataBlockMutex->unlock();
 
@@ -111,7 +118,9 @@ public:
 					}
 					++dataBlock;
 				}
-
+				
+				// When finished working on the available data blocks of a given thread -> continue to search for other work
+				// --------------------------------------------------
 				assistedThreadID = (assistedThreadID + 1) % nthreads;
 			} while (assistedThreadID != threadID);
 		}
@@ -167,9 +176,6 @@ public:
 				// ------------------------------------------
 				chunkIndex += threadArguments[t].chunkSize;
 
-				/*
-				* Data Blocks
-				*/
 				// Calculate number of data blocks for the thread
 				// ----------------------------------------------
 				nDataBlocks = nDataBlocks > threadArguments[t].chunkSize ? threadArguments[t].chunkSize / 2 : nDataBlocks;
