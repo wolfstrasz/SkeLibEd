@@ -205,7 +205,6 @@ public:
 			// -----------
 			for (size_t t = 0; t< nthreads; ++t) {
 				THREADS[t] = new std::thread(&MapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, threadArguments, t, args...);
-				std::thread(&MapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, threadArguments, t, args...);
 			}
 
 			// Join threads
