@@ -1,0 +1,44 @@
+#!/bin/bash
+################################################################################################
+# Script for transfering files from Visual Studio 2017  PSLED solution to LinuxLib
+#
+# VS17 has a folder and projects stuctures, whereas in LinuxLib all files are in the same folder
+#
+#
+#
+#
+################################################################################################
+echo ""
+echo ""
+
+echo "Executing VS to Dice LinuxLib transfer"
+echo "======================================"
+echo ""
+
+# Copy files from project
+echo "Copying files from Skelibed library..."
+cp -r SkeLibEd/src/. LinuxLib/
+echo "...Finished copying files"
+echo "======================================"
+echo ""
+
+# Copy files from SkeLibEd_Tester
+echo "Copying files from Skelibed Tester..."
+cp -r SkeLibEd_Tester/src/. LinuxLib/
+echo "...Finished copying files"
+echo "======================================"
+echo ""
+
+# Compile using GCC
+echo "Compiling Application using GCC: "
+echo "(LSTDC++)(STD=C++11)(LPTHREADS)..."
+gcc LinuxLib/Application.cpp -lstdc++ -std=c++11 -lpthread -o run.out
+echo "...Finished Compiling."
+echo "=> Output executable: run.out"
+echo "======================================"
+echo ""
+
+
+echo ""
+echo ""
+
