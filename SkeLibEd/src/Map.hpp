@@ -75,9 +75,9 @@ public:
 		template<typename IN, typename OUT, typename ...ARGs>
 		void threadMap(ThreadArgument<IN, OUT> *threadArguments, size_t threadID, ARGs... args) {
 
-			//auto k = new std::thread()
-			//auto input = threadArguments[threadID].input;
-			//auto output = threadArguments[threadID].output;
+			auto k = new std::thread()
+			auto input = threadArguments[threadID].input;
+			auto output = threadArguments[threadID].output;
 
 			//std::cout << "Thread here " << threadID << std::endl;
 

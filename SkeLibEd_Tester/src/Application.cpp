@@ -25,7 +25,7 @@ int main()
 	auto map = Map(elemental, thread_count);
 
 	// Execute Map skeleton
-	//map(out, in, elemental_arg);
+	map(out, in, elemental_arg);
 
 	// Check output 
 	for (size_t i = 0; i < NITEMS; i++)
