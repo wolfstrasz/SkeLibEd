@@ -11,16 +11,38 @@ int combiner (int a, int b) {
 	return (a+b) % INT_MAX;
 }
 
+// MAP REDUCE
+auto mapper = [](int a) {
+	std::list<std::pair<int, int>> res = { std::make_pair(a,1) };
+	return res;
+};
+
+auto reducer = [](int key, std::list<int> values) {
+	std::list<int> sum = { (int)values.size() };
+	return sum;
+};
+
+auto hasher = [](int key){ return std::hash<int>{}(key); };
+
+bool f (std::pair <int,int> a, std::pair <int,int> b){
+	return a.first < b.first;
+}
 int main()
 {
 	// ---------------------------------------------
 	// output data
 	std::vector<int> out(NITEMS);
+	std::vector<std::pair<int,int>> mrout;
 	int sum;
 	// input data
 	std::vector<int> in(NITEMS);
-	for (size_t i = 0; i < NITEMS; ++i) {
+	for (size_t i = 0; i < NITEMS; i++) {
 		in[i] = i;
+	}
+	std::vector<int> mrin(NITEMS);
+	for (size_t i = 0; i <NITEMS; i+=10	) {
+		for (size_t j = i; j < i + 10; j++)
+			mrin[j] = i;
 	}
 	// ---------------------------------------------
 
@@ -49,6 +71,19 @@ int main()
 	std::cout << "OVERAL SUM = " << sum << std::endl;
 
 	// -----------------------------------------------
+
+	// MapReduce skeleton
+	auto mapreduce = MapReduce (mapper, reducer, hasher, thread_count);
+	// Execute MapReduce skeleton
+	mapreduce(mrout, mrin);
+	// Sort output
+	sort(mrout.begin(), mrout.end(), f);
+	// Check output
+	for (size_t i = 0; i< mrout.size(); i++){
+		std::cout << "(" << mrout[i].first << ", " << mrout[i].second << ")\n";
+	}
+	std:: cout << "SIZE OF MRIN  :" << mrin.size() << std::endl;
+	std:: cout << "SIZE OF MROUT :" << mrout.size()<< std::endl;
 	//std::cin.get();
 }
 /*dsadasd*/

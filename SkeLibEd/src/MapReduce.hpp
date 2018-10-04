@@ -76,6 +76,10 @@ public:
 		size_t nthreads;
 		size_t nDataBlocks;
 
+		MapReduceElemental<EL> elemental;
+		MapReduceReducer<RE> reducer;
+		MapReduceHasher<HA> hasher;
+
 		/*
 		*
 		*ThreadArgument
@@ -115,11 +119,8 @@ public:
 			std::mutex *reduceKeysMutex;
 
 			ThreadArgument() {
-
 				reduceHashTable = new std::unordered_map<size_t, std::pair<K2, std::list<V2> *>>();
-
 				reduceKeysMutex = new std::mutex();
-
 				mapChunkSignedThreads = 1;
 			}
 
@@ -204,118 +205,126 @@ public:
 			using MAP_OUTPUT = std::list<std::pair<K2, V2>>;
 			using REDUCE_OUTPUT = std::list<V2>;
 
-			/*
-			* Map
-			*
-			* Each thread
-			*/
+			// ---------------------------------------------------------------------
+			// MAP PHASE:
+			// ---------------------------------------------------------------------
 			auto mapInput = threadArguments[threadID].input;
 			auto mapOutputValues = threadArguments[threadID].mapOutputValues;
 
-			size_t assignedThreadID = threadID;
+			size_t assignedThreadID = threadID; // Assigns first job to be helping itself
 			do {
 
+				// Lock for sign-up and look for work
+				// ----------------------------------
 				threadArguments[assignedThreadID].signUpMutex->lock();
-				if (threadArguments[assignedThreadID].mapChunkSignedThreads == 0) {// Zero signed-threads means this chunk's work is completed.
+
+				// Zero signed-threads means this chunk's work is completed.
+				// --------------------------------------------------------
+				if (threadArguments[assignedThreadID].mapChunkSignedThreads == 0) {
 					threadArguments[assignedThreadID].signUpMutex->unlock();
 					assignedThreadID = (assignedThreadID + 1) % nthreads;
 					continue;
 				}
 
-				// thread is "signed" by default to its own chunck
-				if (assignedThreadID != threadID) threadArguments[assignedThreadID].mapChunkSignedThreads++;
+				// If thread is assisting another thread => mark as signed for primary thread
+				// --------------------------------------------------------------------------
+				if (assignedThreadID != threadID)
+					threadArguments[assignedThreadID].mapChunkSignedThreads++;
 				threadArguments[assignedThreadID].signUpMutex->unlock();
 
-
+				// Assign new variables for data for easier reading
+				// ------------------------------------------------
 				auto mapDataBlockMutexes = threadArguments[assignedThreadID].dataBlockMutexes;
 				auto mapDataBlockFlags = threadArguments[assignedThreadID].dataBlockFlags;
 				auto mapDataBlockIndices = threadArguments[assignedThreadID].dataBlockIndices;
 				auto mapDataBlocks = threadArguments[assignedThreadID].mapDataBlocks;
 
-				//why shouldn't we 'steal' even the first data block? :P
+				// Starts to iterate over data blocks of given thread (assisting / not)
+				// --------------------------------------------------------------------
 				size_t dataBlock = 0;
-
 				while (dataBlock < mapDataBlocks) {
 
-					if (mapDataBlockFlags[dataBlock] == 0) {// if the data block has been, or being processed by another thread...
-						++dataBlock;
-						continue; //move on to the next data block.
-					}
-
+					// Lock and check if block is has not been processed already
+					// ---------------------------------------------------------
 					mapDataBlockMutexes[dataBlock].lock();
+
 					if (mapDataBlockFlags[dataBlock] == 1) {
-						mapDataBlockFlags[dataBlock] = 0;
+						mapDataBlockFlags[dataBlock] = 0;		// Set as processed
 						mapDataBlockMutexes[dataBlock].unlock();
 
-						for (size_t inputIndex = mapDataBlockIndices[dataBlock]; inputIndex < mapDataBlockIndices[dataBlock + 1]; ++inputIndex) {
-
+						// Process the data block
+						// ----------------------
+						for (size_t inputIndex = mapDataBlockIndices[dataBlock];
+							 	inputIndex < mapDataBlockIndices[dataBlock + 1]; inputIndex++ ){
 							mapOutputValues[inputIndex] = elemental.elemental(mapInput->at(inputIndex), args...);
 						}
-					}
-					else { // Just in case after the first if, the flag changes its value to 0 from another thread
-						mapDataBlockMutexes[dataBlock].unlock();
-					}
+					} else mapDataBlockMutexes[dataBlock].unlock();
 
-					++dataBlock;
+					dataBlock++;
 				}
+				// ---------------------------------------------------------------------
+				// REDUCE PHASE 1:
+				// ---------------------------------------------------------------------
 
-				/*
-				* Thread will combine dataBlockReducedValues if it is the last "signed-up" thread
-				*/
+				// Thread will combine dataBlockReducedValues if it is the last "signed-up" thread
+				// -------------------------------------------------------------------------------
 				threadArguments[assignedThreadID].signUpMutex->lock();
 				threadArguments[assignedThreadID].mapChunkSignedThreads--;
 				if (threadArguments[assignedThreadID].mapChunkSignedThreads == 0) {
 					threadArguments[assignedThreadID].signUpMutex->unlock();
 
+
 					auto &reduceHashTable = threadArguments[assignedThreadID].reduceHashTable;
 
+					// Go through data blocks of current chunl and fill the hash tables
+					// ----------------------------------------------------------------
 					for (size_t inputIndex = mapDataBlockIndices[0]; inputIndex < mapDataBlockIndices[mapDataBlocks]; ++inputIndex) {
+						// For each map output, assign it to a possition in the hash table
+						// ---------------------------------------------------------------	// key_value = pair(key,value)
+						for (auto &key_value : mapOutputValues[inputIndex]) {				// key_vlaue.first  = key
+							auto hashValue = hasher.hasher(key_value.first);				// key_value.second = value
 
-						for (auto &key_value : mapOutputValues[inputIndex]) {
-
-							auto hashValue = hasher.hasher(key_value.first);
-
+							// If we have entries with given hash code -> push in data value
+							// -------------------------------------------------------------
 							if (reduceHashTable->count(hashValue)) {
-
 								reduceHashTable->at(hashValue).second->push_back(key_value.second);
-
 								deleteIfPointer(key_value.first);
-
 							}
+							// else create a new entry in the hash table with the given data value
+							// -------------------------------------------------------------------
 							else {
 								REDUCE_OUTPUT *keyList = new REDUCE_OUTPUT{ key_value.second };
-
 								reduceHashTable->insert(std::make_pair(hashValue, std::make_pair(key_value.first, keyList)));
 							}
 						}
 					}
-				}
-				else {
-					threadArguments[assignedThreadID].signUpMutex->unlock();
-				}
+				} else threadArguments[assignedThreadID].signUpMutex->unlock();
 
+				// When finished working on the available data blocks of a given thread
+				// -> continue to search for other work
+				// -------------------------------------
 				assignedThreadID = (assignedThreadID + 1) % nthreads;
-
 			} while (assignedThreadID != threadID);
 
-			/*
-			* sync
-			*/
+			// -----------------------------------------------------------------------------------------
+			// PHASE 2 - For every iteration, half threads from the previous one combine the hashTables
+			//           of two threads. The logic is the same with Reduce Skeleton.
+			// -----------------------------------------------------------------------------------------
+
+			// Check for synchronization before continuing
+			// -------------------------------------------
 			threadArguments[threadID].barrier1(nthreads);
 
-
-			/*
-			* Phase: For every iteration, half threads from the previous one combine the hashTables
-			*        of two threads. The logic is the same with Reduce Skeleton.
-			*
-			* Each pair of threads
-			*/
-			size_t numberOfThreadsInStage = nthreads >> 1; //TODO: hardcoded?
-			size_t offset = 2; //TODO: hardcoded?
+			// Arguments for first stage of Phase 2
+			// ------------------------------------
+			size_t offset = 2; 													//TODO: hardcoded?
+			size_t numberOfThreadsInStage = nthreads >> 1; 						//TODO: hardcoded?
+			size_t carry = nthreads % 2 ? nthreads - 1 : 0; 					//TODO: hardcoded?
 			size_t threadPair = 1;
-			size_t carry = nthreads % 2 ? nthreads - 1 : 0; //TODO: hardcoded?
 
-			while (threadID < numberOfThreadsInStage) {
+			// Start tree reduction
+			// --------------------
+			while (threadID < numberOfThreadsInStage) { // Chooses if thread is going to be active -> dependent on how much are needed as active
 
 				auto reduceHashTable = threadArguments[threadID * offset].reduceHashTable;
 
@@ -328,7 +337,6 @@ public:
 						Apair.second->splice(Apair.second->end(), *hashKey_Bpair.second.second);
 
 						delete hashKey_Bpair.second.second;
-
 						deleteIfPointer(hashKey_Bpair.second.first);
 
 					}
@@ -337,6 +345,8 @@ public:
 					}
 				}
 
+				// If uneven amount of values are present -> we have a carry that has to be added
+				// ------------------------------------------------------------------------------
 				if (threadID == 0 && carry) {
 
 					for (auto &hashKey_Bpair : *threadArguments[carry].reduceHashTable) {
@@ -348,37 +358,38 @@ public:
 							Apair.second->splice(Apair.second->end(), *hashKey_Bpair.second.second);
 
 							delete hashKey_Bpair.second.second;
-
 							deleteIfPointer(hashKey_Bpair.second.first);
-						}
-						else {
+						} else {
 
 							reduceHashTable->operator[](hashKey_Bpair.first) = hashKey_Bpair.second;
 						}
 					}
-
 					carry = 0;
 				}
 
+				// Check for synchronization before continuing
+				// -------------------------------------------
 				threadArguments[threadID].barrier2(numberOfThreadsInStage);
 
-				if (threadID == 0 && numberOfThreadsInStage % 2) carry = (2 * numberOfThreadsInStage - 2) * threadPair;
+				// Calculate if carry is present in next stage
+				// -------------------------------------------
+				if (threadID == 0 && numberOfThreadsInStage % 2)
+					carry = (2 * numberOfThreadsInStage - 2) * threadPair;
 
+				// Update next stage arguments
+				// ---------------------------
 				offset <<= 1;
 				threadPair <<= 1;
 				numberOfThreadsInStage >>= 1;
 			}
 
-			/*
-			* sync
-			*/
+			// Check for synchronization before continuing
+			// -------------------------------------------
 			threadArguments[threadID].barrier1(nthreads);
 
-			/*
-			* Phase: Thread 0 assigns keys to each thread.
-			*
-			* Thread 0
-			*/
+			// -----------------------------------------------------------------------------------------
+			// PHASE 3 - Thread 0 assigns keys to each thread.
+			// -----------------------------------------------------------------------------------------
 			if (threadID == 0) {
 
 				auto &reduceHashTable = threadArguments[0].reduceHashTable;
@@ -392,17 +403,13 @@ public:
 				}
 			}
 
-
-			/*
-			* sync
-			*/
+			// Check for synchronization before continuing
+			// -------------------------------------------
 			threadArguments[threadID].barrier1(nthreads);
 
-			/*
-			* Phase: Each thread applies its keys to the reducer
-			*
-			* Each thread
-			*/
+			// -----------------------------------------------------------------------------------------
+			// PHASE 4 - Each thread applies its keys to the reducer
+			// -----------------------------------------------------------------------------------------
 			size_t assistedThreadID = threadID;
 			do {
 
@@ -443,10 +450,8 @@ public:
 			} while (assistedThreadID != threadID);
 		}
 
-		MapReduceElemental<EL> elemental;
-		MapReduceReducer<RE> reducer;
-		MapReduceHasher<HA> hasher;
-
+		// Constructor
+		// -----------
 		MapReduceImplementation(MapReduceElemental<EL> &elemental, MapReduceReducer<RE> &reducer, MapReduceHasher<HA> &hasher, size_t threads)
 			: elemental(elemental), reducer(reducer), hasher(hasher), nthreads(threads) {
 			this->nDataBlocks = 10;
@@ -462,35 +467,41 @@ public:
 
 			this->operator()(tempOutput, input, args...);
 
+			// Undo mapping from tempOutput to output
+			// --------------------------------------
 			output.resize(tempOutput.size());
 			size_t outputIndex = 0;
 			for (auto &pair : tempOutput) {
-
 				output[outputIndex++] = { pair.first, pair.second[0] };
 			}
 		}
 
+		// Overide the paranthesis operator
+		// --------------------------------
 		template<typename IN, typename K2, typename V2, typename ...ARGs>
 		void operator()(std::vector<std::pair<K2, std::vector<V2>>> &output, std::vector<IN> &input, ARGs... args) {
 
+			// Optimization to best number of threads
+			// --------------------------------------
 			nthreads = nthreads ? nthreads : std::thread::hardware_concurrency();
 
 			using MAP_OUTPUT = std::list<std::pair<K2, V2>>;
 			using REDUCE_OUTPUT = std::list<V2>;
-			/*
-			* TODO: Handle input.size == 0 or 1
-			* Hardcoded for now...
-			*/
-			if (input.size() == 0) {
-				return;
-			}
+
+			// Hardcoded for input sizes of 0 and 1
+			// ------------------------------------
+			if (input.size() == 0) { return; }
 			//                if( input.size() == 1 ) {
 			//                  TODO: Handle this case?
 			//                }
 
+			// Generate Threads, Thread Arguments
+			// ----------------------------------
 			std::thread *THREADS[nthreads];
 			ThreadArgument<IN, K2, V2> *threadArguments = new ThreadArgument<IN, K2, V2>[nthreads];
 
+			// Generate communication variables
+			// --------------------------------
 			size_t threadsArrived1 = 0;
 			std::mutex barrierLock1;
 			std::condition_variable cond_var1;
@@ -501,13 +512,18 @@ public:
 
 			auto mapOutputValues = new MAP_OUTPUT[input.size()];
 
+			// Assign proper data chunks to thread arguments
+			// ---------------------------------------------
 			size_t chunkIndex = 0;
 			for (size_t t = 0; t < nthreads; ++t) {
 
+				// Calculate size of chunks			// When data can't be divided in equal chunks we must increase the
+				// ------------------------			// data processed by the first DataSize(mod ThreadCount) threads.
 				if (t < (input.size() % nthreads)) threadArguments[t].mapChunkSize = 1 + input.size() / nthreads;
 				else threadArguments[t].mapChunkSize = input.size() / nthreads;
 
-
+				// Assign communication variables
+				// ------------------------------
 				threadArguments[t].threadsArrived1 = &threadsArrived1;
 				threadArguments[t].barrierLock1 = &barrierLock1;
 				threadArguments[t].cond_var1 = &cond_var1;
@@ -516,51 +532,64 @@ public:
 				threadArguments[t].barrierLock2 = &barrierLock2;
 				threadArguments[t].cond_var2 = &cond_var2;
 
+				// Assign general variables
+				// ------------------------
 				threadArguments[t].input = &input;
 				threadArguments[t].threadMapInputIndex = chunkIndex;
-
-				chunkIndex += threadArguments[t].mapChunkSize;
 				threadArguments[t].mapOutputValues = mapOutputValues;
 
-				/*
-				* Data Blocks
-				*/
-				/*times 2 so we can have at least 2 items per data block*/
+				// Shift chunk index for next thread argument
+				// ------------------------------------------
+				chunkIndex += threadArguments[t].mapChunkSize;
+
+				// ------------------------------------------------------------------------------------------
+				// DATA BLOCKS
+				// ------------------------------------------------------------------------------------------
+
+				// Calculate number of data blocks for the thread
+				// ----------------------------------------------
 				nDataBlocks = nDataBlocks * 2 > threadArguments[t].mapChunkSize ? std::max(threadArguments[t].mapChunkSize / 2, (size_t)1) : nDataBlocks;
 
+				// Generate data blocks arguments for the thread
+				// ---------------------------------------------
 				threadArguments[t].mapDataBlocks = nDataBlocks;
-
 				threadArguments[t].signUpMutex = new std::mutex;
-
+				threadArguments[t].dataBlockMutexes = new std::mutex[nDataBlocks];
+				threadArguments[t].dataBlockIndices = new size_t[nDataBlocks + 1]();
 				threadArguments[t].dataBlockFlags = new short int[nDataBlocks]();
 				std::fill_n(threadArguments[t].dataBlockFlags, nDataBlocks, BLOCK_FLAG_INITIAL_VALUE);
 
-				threadArguments[t].dataBlockMutexes = new std::mutex[nDataBlocks];
+				// Assign data block info to thread argument
+				// -----------------------------------------
+				size_t blockSize;
+				size_t blockStart = threadArguments[t].threadMapInputIndex;
 
-				threadArguments[t].dataBlockIndices = new size_t[nDataBlocks + 1]();
+				for (size_t block = 0; block < nDataBlocks; block++) {
+					// Assign block index
+					threadArguments[t].dataBlockIndices[block] = blockStart;
 
-				size_t blockSize, blockStart = threadArguments[t].threadMapInputIndex, blockEnd;
-
-				for (size_t block = 0; block < nDataBlocks; ++block) {
-
+					// Calculate block size for the current block
 					if (block < (threadArguments[t].mapChunkSize % nDataBlocks)) blockSize = 1 + threadArguments[t].mapChunkSize / nDataBlocks;
 					else blockSize = threadArguments[t].mapChunkSize / nDataBlocks;
 
-					blockEnd = blockStart + blockSize;
-					threadArguments[t].dataBlockIndices[block] = blockStart;
-					blockStart = blockEnd;
+					// Shift block start index for next iteration
+					blockStart += blockSize;
 				}
-				threadArguments[t].dataBlockIndices[nDataBlocks] = blockEnd;
+				// Assign index for last block
+				threadArguments[t].dataBlockIndices[nDataBlocks] = blockStart;
 			}
 
-			for (size_t t = 0; t < nthreads; ++t) {
+			// Run threads
+			// -----------
+			for (size_t t = 0; t < nthreads; ++t)
 				THREADS[t] = new std::thread(&MapReduceImplementation<EL, RE, HA>::threadMapReduce<IN, K2, V2, ARGs...>, this, threadArguments, t, args...);
-			}
 
-			for (size_t t = 0; t < nthreads; ++t) {
-				THREADS[t]->join();
-				delete THREADS[t];
-			}
+			// Join threads
+			// ------------
+			for (size_t t = 0; t < nthreads; ++t) { THREADS[t]->join(); delete THREADS[t]; }
+
+			// Tidy up after finishing
+			// -----------------------
 
 			/* CAUTION!!! */    output.clear();
 			output.resize(threadArguments[0].reduceHashTable->size());
@@ -584,32 +613,34 @@ public:
 
 		}
 
-
+		// Friend Functions for MapReduce Implementation Class
+		// ---------------------------------------------------
 		template<typename HA2, typename EL2, typename RE2>
 		friend MapReduceSkeleton::MapReduceImplementation<EL2, RE2, HA2> __MapReduceWithAccess(EL2 el, RE2 re, HA2 hasher, size_t threads);
 	};
-
+	// Friend Functions for MapReduce Skeleton Class
+	// ---------------------------------------------
 	template<typename HA2, typename EL2, typename RE2>
 	friend MapReduceSkeleton::MapReduceImplementation<EL2, RE2, HA2> __MapReduceWithAccess(EL2 el, RE2 re, HA2 hasher, size_t threads);
 };
 
+/*
+* We cannot define a friend function with default argument
+* that needs access to inner class on latest g++ compiler versions.
+* We need a wrapper!
+*/
 template<typename HA, typename EL, typename RE>
 MapReduceSkeleton::MapReduceImplementation<EL, RE, HA> __MapReduceWithAccess(EL el, RE re, HA ha, size_t threads) {
 
 	MapReduceSkeleton::MapReduceElemental<EL> elemental(el);
 	MapReduceSkeleton::MapReduceReducer<RE> reducer(re);
 	MapReduceSkeleton::MapReduceHasher<HA> hasher(ha);
-
-	MapReduceSkeleton::MapReduceImplementation<EL, RE, HA> mr(elemental, reducer, hasher, threads);
-
-	return mr;
+	return MapReduceSkeleton::MapReduceImplementation<EL, RE, HA> (elemental, reducer, hasher, threads);
 }
 
 template<typename HA, typename EL, typename RE>
 MapReduceSkeleton::MapReduceImplementation<EL, RE, HA> MapReduce(EL el, RE re, HA hasher, size_t threads = 0) {
-
 	return __MapReduceWithAccess(el, re, hasher, threads);
 }
 
 #endif /* MAPREDUCE_HPP */
-

@@ -114,7 +114,6 @@ public:
 
 			auto input = threadArguments[threadID].input;
 
-
 			// -----------------------------------------------------------------------------------------
 			// PHASE 1 - Reducing first level data to number of threads data items called reduced values
 			// -----------------------------------------------------------------------------------------
@@ -157,7 +156,7 @@ public:
 					dataBlockMutexes[dataBlock].lock();
 
 					if (dataBlockFlags[dataBlock] == 1) {
-						dataBlockFlags[dataBlock] = 0; // Set as processed
+						dataBlockFlags[dataBlock] = 0; 		// Set as processed
 						dataBlockMutexes[dataBlock].unlock();
 
 						// Assign first input to accumulating variable (accumulator)
@@ -167,10 +166,9 @@ public:
 						// Process the data block
 						// ----------------------
 						for (size_t elementIndex = dataBlockIndices[dataBlock] + 1;
-								elementIndex < dataBlockIndices[dataBlock + 1];
-									elementIndex++)
+								elementIndex < dataBlockIndices[dataBlock + 1]; elementIndex++ ){
 							accumulator = combiner.combiner(accumulator, input->at(elementIndex), args...);
-
+						}
 						// Assign final reduced variable of block to dataBlockReducedValues
 						// ----------------------------------------------------------------
 						dataBlockReducedValues[dataBlock] = accumulator;
@@ -185,6 +183,7 @@ public:
 				threadArguments[assignedThreadID].chunkSignedThreads--;
 				if (threadArguments[assignedThreadID].chunkSignedThreads == 0) {
 					threadArguments[assignedThreadID].signUpMutex->unlock();
+
 					// Assign first reduced value to accumulating variable (accumulator)
 					// -----------------------------------------------------------------
 					IN accumulator = dataBlockReducedValues[0];
@@ -221,13 +220,14 @@ public:
 
 			// Arguments for each stage of Phase 2
 			// -----------------------------------
-			size_t numberOfThreadsInStage = nthreads >> 1; 						//TODO: hardcoded?
 			size_t offeset = 2; 												//TODO: hardcoded?
+			size_t numberOfThreadsInStage = nthreads >> 1; 						//TODO: hardcoded?
 			size_t carry = nthreads % 2 ? nthreads - 1 : 0; 					//TODO: hardcoded?
 			size_t threadPair = 1;
-			IN accumulator;
+
 			// Start tree reduction
 			// --------------------
+			IN accumulator;
 			while (threadID < numberOfThreadsInStage) {	// Chooses if thread is going to be active -> dependent on how much are needed as active
 
 				// Combine every pair of data items (store them in the first's data item place)
@@ -248,12 +248,17 @@ public:
 					carry = 0;
 				}
 
-				//
+				// Check for synchronization before continuing
+				// -------------------------------------------
 				threadArguments[threadID].barrier(numberOfThreadsInStage);
 
+				// Calculate if carry is present in next stage
+				// -------------------------------------------
 				if (threadID == 0 && numberOfThreadsInStage % 2)
 					carry = (2 * numberOfThreadsInStage - 2) * threadPair;
 
+				// Update next stage arguments
+				// ---------------------------
 				offeset <<= 1;
 				threadPair <<= 1;
 				numberOfThreadsInStage >>= 1;
@@ -292,13 +297,14 @@ public:
 				return;
 			}
 
-			// Generate Threads, Thread Arguments, Temporary Output Vector
-			// -------------------------------------
+			// Generate Threads, Thread Arguments, Stage Output Vector
+			// -------------------------------------------------------
 			std::thread *THREADS[nthreads];
 			ThreadArgument<IN> *threadArguments = new ThreadArgument<IN>[nthreads];
 			std::vector<IN> stageOutput(nthreads);
 
-			// Generate communications variables
+			// Generate communication variables
+			// --------------------------------
 			size_t threadsArrived = 0;
 			std::mutex barrierLock;
 			std::condition_variable cond_var;
@@ -328,6 +334,10 @@ public:
 				// Shift chunk index for next thread argument
 				// ------------------------------------------
 				chunkIndex += threadArguments[t].chunkSize;
+
+				// ------------------------------------------------------------------------------------------
+				// DATA BLOCKS
+				// ------------------------------------------------------------------------------------------
 
 				// Calculate number of data blocks for the thread
 				// ----------------------------------------------

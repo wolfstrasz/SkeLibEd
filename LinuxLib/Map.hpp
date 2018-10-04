@@ -170,6 +170,10 @@ public:
 				// ------------------------------------------
 				chunkIndex += threadArguments[t].chunkSize;
 
+				// ------------------------------------------------------------------------------------------
+				// DATA BLOCKS
+				// ------------------------------------------------------------------------------------------
+
 				// Calculate number of data blocks for the thread
 				// ----------------------------------------------
 				nDataBlocks = nDataBlocks > threadArguments[t].chunkSize ? threadArguments[t].chunkSize / 2 : nDataBlocks;
