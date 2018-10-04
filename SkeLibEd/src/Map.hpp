@@ -42,8 +42,7 @@ public:
 		// --------------
 		template<typename IN, typename OUT>
 		class ThreadArgument {
-
-		public:
+			public:
 			size_t threadInputIndex;
 			size_t chunkSize;
 
@@ -71,56 +70,51 @@ public:
 		// ThreadMap - function applied to each thread
 		// --------------------------------------------
 		//	THREADS[t] = new std::thread(&MapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, threadArguments, t, args...);
-
 		template<typename IN, typename OUT, typename ...ARGs>
 		void threadMap(ThreadArgument<IN, OUT> *threadArguments, size_t threadID, ARGs... args) {
 
-			auto k = new std::thread();
 			auto input = threadArguments[threadID].input;
 			auto output = threadArguments[threadID].output;
 
-			//std::cout << "Thread here " << threadID << std::endl;
-
-			// Assing the job of the current thread to assist itself
-			// -----------------------------------------------------
-			size_t assistedThreadID = threadID;
+			size_t assistedThreadID = threadID; // Assigns first job to be helping itself
 			do {
 
+				// Assign new variables for data for easier reading
+				// ------------------------------------------------
 				size_t			nDataBlocks		 = threadArguments[assistedThreadID].nDataBlocks;
 				std::mutex*		dataBlockMutex	 = threadArguments[assistedThreadID].dataBlockMutex;
 				unsigned char*	dataBlockFlags	 = threadArguments[assistedThreadID].dataBlockFlags;
 				std::size_t*	dataBlockIndices = threadArguments[assistedThreadID].dataBlockIndices;
 
-				size_t dataBlock = 0;
 
-				// Starts to iterate over data blocks of given thread
-				// --------------------------------------------------
+				// Starts to iterate over data blocks of given thread (assisting / not)
+				// --------------------------------------------------------------------
+				size_t dataBlock = 0;
 				while (dataBlock < nDataBlocks) {
 
-					// Check for availability of a data block (no other thread is working on it)
-					// -------------------------------------------------------------------------
-					if (dataBlockFlags[dataBlock] == 0 || dataBlockIndices[dataBlock] == dataBlockIndices[dataBlock + 1]) {
-						++dataBlock;
-						continue; // If block is being worked, current thread should jsut skip it
-					}
-
+					// Lock and check if block is has not been processed already
+					// ---------------------------------------------------------
 					dataBlockMutex->lock();
-					if (dataBlockFlags[dataBlock] == 1) { // where the flag is zero, the following flags are zero too.
-						dataBlockFlags[dataBlock] = 0;
+
+					if (dataBlockFlags[dataBlock] == 1) {
+						dataBlockFlags[dataBlock] = 0;	// Set as processed
 						dataBlockMutex->unlock();
 
-						for (size_t elementIndex = dataBlockIndices[dataBlock]; elementIndex < dataBlockIndices[dataBlock + 1]; ++elementIndex) {
+						// Process the data block
+						// ----------------------
+						for (size_t elementIndex = dataBlockIndices[dataBlock];
+								elementIndex < dataBlockIndices[dataBlock + 1];
+									elementIndex++)
 							output->at(elementIndex) = elemental.elemental(input->at(elementIndex), args...);
-						}
-					}
-					else { // Just in case after the first if, the flag changes its value to 0 from another thread
-						dataBlockMutex->unlock();
-					}
-					++dataBlock;
+
+					} else dataBlockMutex->unlock();
+
+					dataBlock++;
 				}
 
-				// When finished working on the available data blocks of a given thread -> continue to search for other work
-				// --------------------------------------------------
+				// When finished working on the available data blocks of a given thread
+				// -> continue to search for other work
+				// -------------------------------------
 				assistedThreadID = (assistedThreadID + 1) % nthreads;
 			} while (assistedThreadID != threadID);
 		}
@@ -159,7 +153,7 @@ public:
 			// Assign proper data chunks to thread arguments
 			// ---------------------------------------------
 			size_t chunkIndex = 0;
-			for (size_t t = 0; t< nthreads; ++t) {
+			for (size_t t = 0; t < nthreads; t++) {
 
 				// Calculate size of chunks			// When data can't be divided in equal chunks we must increase the
 				// ------------------------			// data processed by the first DataSize(mod ThreadCount) threads.
@@ -188,40 +182,37 @@ public:
 				threadArguments[t].dataBlockFlags = new unsigned char[nDataBlocks]();
 				std::fill_n(threadArguments[t].dataBlockFlags, nDataBlocks, BLOCK_FLAG_INITIAL_VALUE);
 
-				// Assign data block info to thread
-				// --------------------------------
+				// Assign data block info to thread argument
+				// -----------------------------------------
 				size_t blockStart = threadArguments[t].threadInputIndex;
 				size_t blockSize;
-				for (size_t block = 0; block < nDataBlocks; ++block) {
 
-					// Calculate block size for the current data block
+				for (size_t block = 0; block < nDataBlocks; block++) {
+					// Assign block index
+					threadArguments[t].dataBlockIndices[block] = blockStart;
+
+					// Calculate block size for the current block
 					if (block < (threadArguments[t].chunkSize % nDataBlocks)) blockSize = 1 + threadArguments[t].chunkSize / nDataBlocks;
 					else blockSize = threadArguments[t].chunkSize / nDataBlocks;
 
-					// Assign info
-					threadArguments[t].dataBlockIndices[block] = blockStart;
-
-					// Shift block start index
+					// Shift block start index for next iteration
 					blockStart += blockSize;
 				}
+				// Assign index for last block
 				threadArguments[t].dataBlockIndices[nDataBlocks] = blockStart;
 			}
 
 			// Run threads
 			// -----------
-			for (size_t t = 0; t< nthreads; ++t) {
+			for (size_t t = 0; t< nthreads; ++t)
 				THREADS[t] = new std::thread(&MapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, threadArguments, t, args...);
-			}
 
 			// Join threads
 			// ------------
-			for (size_t t = 0; t< nthreads; ++t) {
-				THREADS[t]->join();
-				delete THREADS[t];
-			}
+			for (size_t t = 0; t< nthreads; ++t) { THREADS[t]->join(); delete THREADS[t]; }
 
-			// Tidy up after finish
-			// --------------------
+			// Tidy up after finishing
+			// -----------------------
 			output = tempOutput;
 			delete[] threadArguments;
 		}
@@ -245,16 +236,11 @@ public:
 */
 template<typename EL>
 MapSkeleton::MapImplementation<EL> __MapWithAccess(EL el, const size_t &threads) {
-
-	MapSkeleton::Elemental<EL> elemental(el);
-	MapSkeleton::MapImplementation<EL> map(elemental, threads);
-
-	return map;
+	return MapSkeleton::MapImplementation<EL> (el, threads);
 }
 
 template<typename EL>
 MapSkeleton::MapImplementation<EL> Map(EL el, const size_t &threads = 0) {
-
 	return __MapWithAccess(el, threads);
 }
 
