@@ -576,17 +576,21 @@ public:
 
 				// Assign data block info to thread argument
 				// -----------------------------------------
-				size_t blockSize, blockStart = threadArguments[t].threadInputIndex, blockEnd;
-				for (size_t block = 0; block < nDataBlocks; ++block) {
+				size_t blockStart = threadArguments[t].threadInputIndex;
+				size_t blockSize;
 
+				for (size_t block = 0; block < nDataBlocks; ++block) {
+					// Assign block index
+					threadArguments[t].dataBlockIndices[block] = blockStart;
+
+					// Calculate block size for the current block
 					if (block < (threadArguments[t].chunkSize % nDataBlocks)) blockSize = 1 + threadArguments[t].chunkSize / nDataBlocks;
 					else blockSize = threadArguments[t].chunkSize / nDataBlocks;
 
-					blockEnd = blockStart + blockSize;
-					threadArguments[t].dataBlockIndices[block] = blockStart;
-					blockStart = blockEnd;
+					// Shift block start index for next iteration
+					blockStart += blockSize;
 				}
-				threadArguments[t].dataBlockIndices[nDataBlocks] = blockEnd;
+				threadArguments[t].dataBlockIndices[nDataBlocks] = blockStart;
 			}
 
 			// Run threads
