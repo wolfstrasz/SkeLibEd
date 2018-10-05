@@ -41,6 +41,8 @@ class MapReduceSkeleton {
 
 private:
 
+	// Elemental: Function used by the Map phase
+	// -----------------------------------------
 	template<typename EL>
 	class MapReduceElemental {
 	public:
@@ -49,6 +51,8 @@ private:
 		EL elemental;
 	};
 
+	// Reducer: Function used by the Reduce phase
+	// ------------------------------------------
 	template<typename RE>
 	class MapReduceReducer {
 	public:
@@ -57,6 +61,8 @@ private:
 		RE reducer;
 	};
 
+	// Hasher: Function for the hash mapping
+	// -------------------------------------
 	template<typename HA>
 	class MapReduceHasher {
 	public:
@@ -67,7 +73,8 @@ private:
 
 public:
 
-
+	// MapReduceImplementation: Main functional class of Map Reduce
+	// ------------------------------------------------------------
 	template<typename EL, typename RE, typename HA>
 	class MapReduceImplementation {
 
@@ -80,11 +87,8 @@ public:
 		MapReduceReducer<RE> reducer;
 		MapReduceHasher<HA> hasher;
 
-		/*
-		*
-		*ThreadArgument
-		*
-		*/
+		// ThreadArgument: Keeps data for each thread
+		// ------------------------------------------
 		template<typename IN, typename K2, typename V2>
 		class ThreadArgument {
 
@@ -118,12 +122,12 @@ public:
 			std::list<std::pair<size_t, unsigned char>> reduceKeys;
 			std::mutex *reduceKeysMutex;
 
+			// Constructors
 			ThreadArgument() {
 				reduceHashTable = new std::unordered_map<size_t, std::pair<K2, std::list<V2> *>>();
 				reduceKeysMutex = new std::mutex();
 				mapChunkSignedThreads = 1;
 			}
-
 			ThreadArgument(std::vector<IN> &input, size_t threadInputIndex, size_t chunkSize)
 				: threadMapInputIndex(threadInputIndex), mapChunkSize(chunkSize), input(&input) {
 				reduceHashTable = new std::unordered_map<size_t, std::pair<K2, std::list<V2> *>>();
@@ -132,7 +136,7 @@ public:
 
 				mapChunkSignedThreads = 1;
 			}
-
+			// Destructors
 			~ThreadArgument() {
 
 				delete reduceHashTable;
@@ -147,6 +151,9 @@ public:
 
 			}
 
+
+			// Sync barrier lock 1: Used for sync between phases
+			// -------------------------------------------------
 			void barrier1(size_t numberOfThreadsToBarrier) {
 
 				auto lck = std::unique_lock<std::mutex>(*barrierLock1);
@@ -162,6 +169,8 @@ public:
 				}
 			}
 
+			// Sync barrier lock 2: used while tree reduction of hash maps occurs
+			// ------------------------------------------------------------------
 			void barrier2(size_t numberOfThreadsToBarrier) {
 
 				auto lck = std::unique_lock<std::mutex>(*barrierLock2);
@@ -179,26 +188,22 @@ public:
 
 		};
 
+		// Utility functions
+		// -----------------
 		template<typename P>
-		inline bool isPointer(P *&p) {
-			return true;
-		};
+		inline bool isPointer(P *&p) { return true; };
 
 		template<typename P>
-		inline bool isPointer(P) {
-			return false;
-		};
+		inline bool isPointer(P) { return false; };
 
 		template<typename P>
-		inline void deleteIfPointer(P *&p) {
-			delete p;
-		};
+		inline void deleteIfPointer(P *&p) { delete p; };
 
 		template<typename P>
-		inline void deleteIfPointer(P) {
-			return;
-		};
+		inline void deleteIfPointer(P) { return; };
 
+		// ThreadMapReduce: functionality of the MapReduce pattern
+		// -------------------------------------------------------
 		template<typename IN, typename K2, typename V2, typename ...ARGs>
 		void threadMapReduce(ThreadArgument<IN, K2, V2> *threadArguments, size_t threadID, ARGs... args) {
 
@@ -419,30 +424,28 @@ public:
 
 					auto &reduceKeyFlag = p.second;
 
-					if (reduceKeyFlag == 0) {
-						continue;
-					}
-
+					// Lock and check if block is has not been processed already
+					// ---------------------------------------------------------
 					reduceKeysMutex->lock();
 					if (reduceKeyFlag == 1) {
-						reduceKeyFlag = 0;
+						reduceKeyFlag = 0;			// Set as processed
 						reduceKeysMutex->unlock();
 
 						auto reducePair = threadArguments[0].reduceHashTable->at(p.first);
 
+						// Proccess reduce of pairs
 						REDUCE_OUTPUT reduceRes = reducer.reducer(reducePair.first, *reducePair.second, args...);
 
+						// Tidy up
 						if (isPointer(reducePair.second->front())) {
 							for (auto reduceInputValue : *reducePair.second) {
 								deleteIfPointer(reduceInputValue);
 							}
 						}
-
 						*reducePair.second = reduceRes;
-					}
-					else { // Just in case after the first if, the flag changes its value to 0 from another thread
-						reduceKeysMutex->unlock();
-					}
+
+					} else reduceKeysMutex->unlock();
+					
 				}
 
 				assistedThreadID = (assistedThreadID + 1) % nthreads;

@@ -29,8 +29,8 @@ private:
 	};
 
 public:
-	// ReduceImplementation
-	// --------------------
+	// ReduceImplementation: the main functional class of Reduce
+	// ---------------------------------------------------------
 	template<typename CO>
 	class ReduceImplementation {
 
@@ -40,8 +40,8 @@ public:
 		size_t nDataBlocks;
 		Combiner<CO> combiner;
 
-		// ThreadArgument
-		// --------------
+		// ThreadArgument: keeps all data for each thread
+		// ----------------------------------------------
 		template<typename IN>
 		class ThreadArgument {
 			public:
@@ -82,8 +82,8 @@ public:
 				delete signUpMutex;
 			}
 
-			// Synchronization barrier lock - sends notification
-			// to all threads when they can continue after Phase 1
+			// Synchronization barrier lock: sends notification to
+			// all threads when they can continue after each phase
 			// ---------------------------------------------------
 			void barrier(size_t numberOfThreadsToBarrier) {
 				auto lock = std::unique_lock<std::mutex>(*barrierLock);
@@ -106,8 +106,8 @@ public:
 		template<typename T>
 		inline void deleteIfPointer(T) { return; };
 
-		// ThreadReduce - functionality of the reduce pattern
-		// --------------------------------------------------
+		// ThreadReduce: functionality of the reduce pattern
+		// -------------------------------------------------
 		// THREADS[t] = new std::thread(&ReduceImplementation<CO>::threadReduce<IN, ARGs...>, this, threadArguments, t, args...);
 		template<typename IN, typename ...ARGs>
 		void threadReduce(ThreadArgument<IN> *threadArguments, size_t threadID, ARGs... args) {
@@ -115,7 +115,7 @@ public:
 			auto input = threadArguments[threadID].input;
 
 			// -----------------------------------------------------------------------------------------
-			// PHASE 1 - Reducing first level data to number of threads data items called reduced values
+			// PHASE 1:  Reducing first level data to number of threads data items called reduced values
 			// -----------------------------------------------------------------------------------------
 			size_t assignedThreadID = threadID; // Assigns first job to be helping itself
 			do {
