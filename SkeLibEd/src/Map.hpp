@@ -128,8 +128,8 @@ public:
 		}
 
 	public:
-		// Overide the paranthesis operator
-		// --------------------------------
+		// Paranthesis operator: call function
+		// -----------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 
@@ -214,9 +214,9 @@ public:
 			// Join threads
 			// ------------
 			for (size_t t = 0; t< nthreads; ++t) { THREADS[t]->join(); delete THREADS[t]; }
-
-			// Tidy up after finishing
-			// -----------------------
+			
+			// Tidy-up after finish
+			// --------------------
 			output = tempOutput;
 			delete[] threadArguments;
 		}

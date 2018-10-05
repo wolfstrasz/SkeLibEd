@@ -462,7 +462,8 @@ public:
 		}
 
 	public:
-
+		// Paranthesis operator: call function
+		// -----------------------------------
 		template<typename IN, typename K2, typename V2, typename ...ARGs>
 		void operator()(std::vector<std::pair<K2, V2>> &output, std::vector<IN> &input, ARGs... args) {
 
@@ -590,13 +591,14 @@ public:
 			// Join threads
 			// ------------
 			for (size_t t = 0; t < nthreads; ++t) { THREADS[t]->join(); delete THREADS[t]; }
-
-			// Tidy up after finishing
-			// -----------------------
-
-			/* CAUTION!!! */    output.clear();
+		
+			// We need to resize output dependent on size of hash table
+			// --------------------------------------------------------
+			output.clear();
 			output.resize(threadArguments[0].reduceHashTable->size());
 
+			// Assign hash table to output
+			// ---------------------------
 			size_t outputIndex = 0;
 			for (auto &hashKey_pair : *(threadArguments[0].reduceHashTable)) {
 
@@ -611,9 +613,10 @@ public:
 				delete pair.second;
 			}
 
+			// Tidy-up after finish
+			// --------------------
 			delete[] threadArguments;
 			delete[] mapOutputValues;
-
 		}
 
 		// Friend Functions for MapReduce Implementation Class

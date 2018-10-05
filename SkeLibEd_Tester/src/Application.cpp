@@ -27,12 +27,19 @@ auto hasher = [](int key){ return std::hash<int>{}(key); };
 bool f (std::pair <int,int> a, std::pair <int,int> b){
 	return a.first < b.first;
 }
+// SCAN
+int combine(int a, int b) {
+	return a + b;
+}
+
+// MAIN
 int main()
 {
 	// ---------------------------------------------
 	// output data
 	std::vector<int> out(NITEMS);
 	std::vector<std::pair<int,int>> mrout;
+	std::vector<int> scout(NITEMS);
 	int sum;
 	// input data
 	std::vector<int> in(NITEMS);
@@ -84,6 +91,18 @@ int main()
 	}
 	std:: cout << "SIZE OF MRIN  :" << mrin.size() << std::endl;
 	std:: cout << "SIZE OF MROUT :" << mrout.size()<< std::endl;
+
+	// -----------------------------------------------
+
+	// Scan skeleton
+	auto scan = Scan(combine, thread_count);
+	// Execute Scan skeleton
+	scan(scout, in);
+	// Check output
+	for (size_t i = 0; i < NITEMS; i++)
+		std::cout << "Item [" << i << "] = " << scout[i] << std::endl;
+
+	// -----------------------------------------------
 	//std::cin.get();
 }
 /*dsadasd*/

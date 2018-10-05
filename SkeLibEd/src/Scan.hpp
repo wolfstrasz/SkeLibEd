@@ -1,13 +1,5 @@
-#pragma once
-//
-// Created by tonio on 16/07/18.
-//
-
 #ifndef SKELETONS_SCAN_HPP
 #define SKELETONS_SCAN_HPP
-
-
-
 #include <cstdlib>
 #include <iostream>
 #include <vector>
@@ -25,12 +17,10 @@
 class ScanSkeleton {
 
 private:
-	/*
-	*
-	* Successor
-	*
-	*
-	*/
+	ScanSkeleton() {}
+	
+	// Successor: function used on separate items
+	// ------------------------------------------
 	template<typename SU>
 	class Successor {
 	public:
@@ -38,16 +28,9 @@ private:
 		SU successor;
 	};
 
-	ScanSkeleton() {}
-
-	/**
-	*
-	* ScanImplementation
-	*
-	*
-	*/
 public:
-
+	// ScanImplementation: functionality of the Scan pattern
+	// -----------------------------------------------------
 	template<typename SU>
 	class ScanImplementation {
 
@@ -55,15 +38,10 @@ public:
 		unsigned char BLOCK_FLAG_INITIAL_VALUE;
 		size_t nthreads;
 		size_t nDataBlocks;
-
-
 		Successor<SU> successor;
 
-		/*
-		*
-		* ScanTreeNode
-		*
-		*/
+		// ScanTreeNode: ...
+		// ---------------------------
 		template<typename IN>
 		class ScanTreeNode {
 		public:
@@ -122,16 +100,12 @@ public:
 
 		};
 
-		/*
-		*
-		*ThreadArgument
-		*
-		*/
+		// ThreadArgument: keeps all data for each thread
+		// ----------------------------------------------
 		template<typename IN>
 		class ThreadArgument {
 
 		public:
-
 			size_t * threadsArrived;
 			std::mutex *barrierLock;
 			std::condition_variable *cond_var;
@@ -164,11 +138,12 @@ public:
 			ScanTreeNode<IN> *node;
 			size_t *carry;
 
+			// Constructors
 			ThreadArgument() {}
-
 			ThreadArgument(std::vector<IN> &output, std::vector<IN> &input, size_t threadId, size_t threadInputIndex, size_t chunkSize)
 				: threadInputIndex(threadInputIndex), chunkSize(chunkSize), threadId(threadId), input(&input), output(&output) {}
 
+			// Destructors
 			~ThreadArgument() {
 
 				delete[] dataBlockFlags;
@@ -223,32 +198,29 @@ public:
 			}
 		};
 
-
+		// Constructor
+		// -----------
 		ScanImplementation(Successor<SU> successor, size_t threads) : successor(successor), nthreads(threads) {
 			this->nDataBlocks = 10;
 			this->BLOCK_FLAG_INITIAL_VALUE = 1;
 		}
 
+		// Utility functions
+		// -----------------
 		template<typename T>
-		static inline void deleteIfPointer(T* &p) {
-			delete p;
-		};
+		static inline void deleteIfPointer(T* &p) { delete p; };
 
 		template<typename T>
-		static inline void deleteIfPointer(T) {
-			return;
-		};
+		static inline void deleteIfPointer(T) {	return; };
 
 		template<typename T>
-		static inline T* makeACopy(T* &p) {
-			return new T(*p);
-		}
+		static inline T* makeACopy(T* &p) {	return new T(*p); }
 
-		template<typename T>
-		static inline T makeACopy(T &p) {
-			return p;
-		}
+		template<typename T> 
+		static inline T makeACopy(T &p) { return p; }
 
+		// ThreadScan: functionality of the Scan pattern
+		// ---------------------------------------------
 		template<typename IN, typename ...ARGs>
 		void threadScan(ThreadArgument<IN> *threadArguments, size_t threadID, ARGs... args) {
 
@@ -495,50 +467,38 @@ public:
 		}
 
 	public:
-
+		// Paranthesis operator: call function
+		// -----------------------------------
 		template<typename IN, typename ...ARGs>
 		void operator()(std::vector<IN> &output, std::vector<IN> input, ARGs... args) {
 
+			// Optimization to best number of threads
+			// --------------------------------------
 			nthreads = nthreads ? nthreads : std::thread::hardware_concurrency();
+			nthreads = nthreads * 2 > input.size() ? input.size() / 2 : nthreads;		// x2 because we need atleast 2 items per chunk
 
-			/*times 2 so we can have at least 2 items per chunk*/
-			nthreads = nthreads * 2 > input.size() ? input.size() / 2 : nthreads;
+			// Hardcoded for input sizes of 0 and 1
+			// ------------------------------------
+			if (input.size() == 0) { return; }
+			if (input.size() == 1) { output = input; return; }
 
-			/*
-			* TODO: Handle input.size == 0 or 1
-			* Hardcoded for now...
-			*/
-			if (input.size() == 0) {
-				return;
-			}
-			if (input.size() == 1) {
-
-				output = input;
-				return;
-			}
-
-
-			/*
-			* With 3 items, we reduce them without creating threads.
-			* As in that case, only 1 thread is required.
-			*/
-
+			// When input size is 3 we need only 1 thread for reduction
+			// --------------------------------------------------------
 			if (input.size() < 4) {
-
 				output[0] = input[0];
-
 				output[1] = successor.successor(input[0], input[1], args...);
-
 				output[2] = successor.successor(output[1], input[2], args...);
-
 				return;
 			}
 
-			std::vector<IN> tempOutput(input.size());
-
+			// Generate Threads, Thread Arguments, Thread Output Vector
+			// --------------------------------------------------------
 			std::thread *THREADS[nthreads];
 			ThreadArgument<IN> *threadArguments = new ThreadArgument<IN>[nthreads];
+			std::vector<IN> tempOutput(input.size());
 
+			// Generate synchronization variables
+			// ----------------------------------
 			size_t threadsArrived = 0;
 			std::mutex barrierLock;
 			std::condition_variable cond_var;
@@ -555,17 +515,21 @@ public:
 			std::mutex nodeLock;
 			std::condition_variable rootCond_var;
 
+			// Assign proper data chunks to thread arguments
+			// ---------------------------------------------
 			size_t chunkIndex = 0;
-
-			size_t carry = nthreads % 2 ? nthreads - 1 : 0;
-
+			size_t carry = nthreads % 2 ? nthreads - 1 : 0; // We are using a tree structure so a carry is possible at any depth
 			for (size_t t = 0; t< nthreads; ++t) {
 
+				// Calculate size of chunks			// When data can't be divided in equal chunks we must increase the
+				// ------------------------			// data processed by the first DataSize(mod ThreadCount) threads.
 				if (t < (input.size() % nthreads)) threadArguments[t].chunkSize = 1 + input.size() / nthreads;
 				else threadArguments[t].chunkSize = input.size() / nthreads;
 
 				threadArguments[t].threadId = t;
 
+				// Assign synchronization variables
+				// --------------------------------
 				threadArguments[t].threadsArrived = &threadsArrived;
 				threadArguments[t].barrierLock = &barrierLock;
 				threadArguments[t].cond_var = &cond_var;
@@ -578,35 +542,41 @@ public:
 				threadArguments[t].carryBarrierLock = &carryBarrierLock;
 				threadArguments[t].carryCond_var = &carryCond_var;
 
-
 				threadArguments[t].threadsCompletedTheirUpTreeTask = &threadsCompletedTheirUpTreeTask;
 				threadArguments[t].nodeLock = &nodeLock;
 				threadArguments[t].rootCond_var = &rootCond_var;
 
+				// Assign general variables
+				// ------------------------
 				threadArguments[t].input = &input;
 				threadArguments[t].output = &tempOutput;
 				threadArguments[t].threadInputIndex = chunkIndex;
-
 				threadArguments[t].carry = &carry;
 
+				// Shift chunk index for next thread argument
+				// ------------------------------------------
 				chunkIndex += threadArguments[t].chunkSize;
 
-				/*
-				* Data Blocks
-				*/
+				// ------------------------------------------------------------------------------------------
+				// DATA BLOCKS
+				// ------------------------------------------------------------------------------------------
+
+				// Calculate number of data blocks for the thread
+				// ----------------------------------------------
 				nDataBlocks = nDataBlocks > threadArguments[t].chunkSize ? threadArguments[t].chunkSize / 2 : nDataBlocks;
 
+				// Generate data blocks arguments for the thread
+				// ---------------------------------------------
 				threadArguments[t].nDataBlocks = nDataBlocks;
-
+				threadArguments[t].dataBlockMutex = new std::mutex;
+				threadArguments[t].dataBlockIndices = new size_t[nDataBlocks + 1]();
 				threadArguments[t].dataBlockFlags = new unsigned char[nDataBlocks]();
 				std::fill_n(threadArguments[t].dataBlockFlags, nDataBlocks, BLOCK_FLAG_INITIAL_VALUE);
 
-				threadArguments[t].dataBlockMutex = new std::mutex;
 
-				threadArguments[t].dataBlockIndices = new size_t[nDataBlocks + 1]();
-
+				// Assign data block info to thread argument
+				// -----------------------------------------
 				size_t blockSize, blockStart = threadArguments[t].threadInputIndex, blockEnd;
-
 				for (size_t block = 0; block < nDataBlocks; ++block) {
 
 					if (block < (threadArguments[t].chunkSize % nDataBlocks)) blockSize = 1 + threadArguments[t].chunkSize / nDataBlocks;
@@ -619,30 +589,39 @@ public:
 				threadArguments[t].dataBlockIndices[nDataBlocks] = blockEnd;
 			}
 
+			// Run threads
+			// -----------
 			for (size_t t = 0; t< nthreads; ++t) {
 				THREADS[t] = new std::thread(&ScanImplementation<SU>::threadScan<IN, ARGs...>, this, threadArguments, t, args...);
 			}
-
-
+			
+			// Join threads
+			// ------------
 			for (size_t t = 0; t< nthreads; ++t) {
 				THREADS[t]->join();
 				delete THREADS[t];
 			}
 
+			// Tidy-up after finish
+			// --------------------
 			delete[] threadArguments;
-
 			output = tempOutput;
-
 		}
 
+		// Friend functions for the Scan Implementation
+		// --------------------------------------------
 		template<typename SU2>
 		friend ScanSkeleton::ScanImplementation<SU2> __ScanWithAccess(SU2 su, const size_t &threads);
 	};
 
+	// Friend functions for ScanSkeleton
+	// ---------------------------------
 	template<typename SU2>
 	friend ScanSkeleton::ScanImplementation<SU2> __ScanWithAccess(SU2 su, const size_t &threads);
 };
 
+// Wrapper
+// -------
 template<typename SU>
 ScanSkeleton::ScanImplementation<SU> __ScanWithAccess(SU su, const size_t &threads) {
 
@@ -654,7 +633,6 @@ ScanSkeleton::ScanImplementation<SU> __ScanWithAccess(SU su, const size_t &threa
 
 template<typename SU>
 ScanSkeleton::ScanImplementation<SU> Scan(SU su, const size_t &threads = 0) {
-
 	return __ScanWithAccess(su, threads);
 }
 
