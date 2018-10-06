@@ -19,8 +19,8 @@ class ReduceSkeleton {
 private:
 	ReduceSkeleton() {}
 
-	// Combiner - function used in reducing
-	// ------------------------------------
+	// Combiner: function used in reducing
+	// -----------------------------------
 	template<typename CO>
 	class Combiner {
 	public:
@@ -29,8 +29,8 @@ private:
 	};
 
 public:
-	// ReduceImplementation
-	// --------------------
+	// ReduceImplementation: the main functional class of Reduce
+	// ---------------------------------------------------------
 	template<typename CO>
 	class ReduceImplementation {
 
@@ -40,8 +40,8 @@ public:
 		size_t nDataBlocks;
 		Combiner<CO> combiner;
 
-		// ThreadArgument
-		// --------------
+		// ThreadArgument: keeps all data for each thread
+		// ----------------------------------------------
 		template<typename IN>
 		class ThreadArgument {
 			public:
@@ -82,8 +82,8 @@ public:
 				delete signUpMutex;
 			}
 
-			// Synchronization barrier lock - sends notification
-			// to all threads when they can continue after Phase 1
+			// Synchronization barrier lock: sends notification to
+			// all threads when they can continue after each phase
 			// ---------------------------------------------------
 			void barrier(size_t numberOfThreadsToBarrier) {
 				auto lock = std::unique_lock<std::mutex>(*barrierLock);
@@ -103,11 +103,12 @@ public:
 		// -------------------------------------
 		template<typename T>
 		inline void deleteIfPointer(T *&p) { delete p; };
+
 		template<typename T>
 		inline void deleteIfPointer(T) { return; };
 
-		// ThreadReduce - functionality of the reduce pattern
-		// --------------------------------------------------
+		// ThreadReduce: functionality of the reduce pattern
+		// -------------------------------------------------
 		// THREADS[t] = new std::thread(&ReduceImplementation<CO>::threadReduce<IN, ARGs...>, this, threadArguments, t, args...);
 		template<typename IN, typename ...ARGs>
 		void threadReduce(ThreadArgument<IN> *threadArguments, size_t threadID, ARGs... args) {
@@ -115,7 +116,7 @@ public:
 			auto input = threadArguments[threadID].input;
 
 			// -----------------------------------------------------------------------------------------
-			// PHASE 1 - Reducing first level data to number of threads data items called reduced values
+			// PHASE 1:  Reducing first level data to number of threads data items called reduced values
 			// -----------------------------------------------------------------------------------------
 			size_t assignedThreadID = threadID; // Assigns first job to be helping itself
 			do {
@@ -273,15 +274,15 @@ public:
 		}
 
 	public:
-		// Overide the paranthesis operator
-		// --------------------------------
+		// Paranthesis operator: call function
+		// -----------------------------------
 		template<typename IN, typename ...ARGs>
 		void operator()(IN &output, std::vector<IN> &input, ARGs... args) {
 
 			// Optimization to best number of threads
 			// --------------------------------------
 			nthreads = nthreads ? nthreads : std::thread::hardware_concurrency();
-			nthreads = nthreads * 2 > input.size() ? input.size() / 2 : nthreads;		// x2 because we need atleast 2 items per junk
+			nthreads = nthreads * 2 > input.size() ? input.size() / 2 : nthreads;		// x2 because we need atleast 2 items per chunk
 
 			// Hardcoded for input sizes of 0 and 1
 			// ------------------------------------
@@ -297,14 +298,14 @@ public:
 				return;
 			}
 
-			// Generate Threads, Thread Arguments, Stage Output Vector
-			// -------------------------------------------------------
+			// Generate Threads, Thread Arguments, Thread Output Vector
+			// --------------------------------------------------------
 			std::thread *THREADS[nthreads];
 			ThreadArgument<IN> *threadArguments = new ThreadArgument<IN>[nthreads];
 			std::vector<IN> stageOutput(nthreads);
 
-			// Generate communication variables
-			// --------------------------------
+			// Generate synchronization variables
+			// ----------------------------------
 			size_t threadsArrived = 0;
 			std::mutex barrierLock;
 			std::condition_variable cond_var;
@@ -319,8 +320,8 @@ public:
 				if (t < (input.size() % nthreads)) threadArguments[t].chunkSize = 1 + input.size() / nthreads;
 				else threadArguments[t].chunkSize = input.size() / nthreads;
 
-				// Assign communication variables
-				// ------------------------------
+				// Assign synchronization variables
+				// --------------------------------
 				threadArguments[t].threadsArrived = &threadsArrived;
 				threadArguments[t].barrierLock = &barrierLock;
 				threadArguments[t].cond_var = &cond_var;
@@ -383,8 +384,8 @@ public:
 			// ------------
 			for (size_t t = 0; t < nthreads; ++t) { THREADS[t]->join(); delete THREADS[t]; }
 
-			// Tidy up after finishing
-			// -----------------------
+			// Tidy-up after finish
+			// --------------------
 			output = threadArguments[0].stageOutput->at(0);
 			delete[] threadArguments;
 		}

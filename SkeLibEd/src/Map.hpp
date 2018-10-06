@@ -214,12 +214,17 @@ public:
 			// Join threads
 			// ------------
 			for (size_t t = 0; t< nthreads; ++t) { THREADS[t]->join(); delete THREADS[t]; }
-			
+
 			// Tidy-up after finish
 			// --------------------
 			output = tempOutput;
 			delete[] threadArguments;
 		}
+
+		// Utility functions for setting options
+		// ------------------------------------
+		void setNumberOfBlocks (size_t nblocks){ this->nDataBlocks = nblocks;}
+		void setNumberOfThreads(size_t nthreads){ this->nthreads = nthreads;}
 
 		// Friend Functions for Map Implementation Class
 		// ---------------------------------------------
