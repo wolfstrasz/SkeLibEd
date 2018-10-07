@@ -26,9 +26,9 @@ void mapTester(EL &func, IN &input, OUT &output, ARGs... args){
 	*/
 
 	int blockCount = 2;
-	for (int b = 1; b <= 10; b++){				// B = block size multiplicative
+	for (int b = 1; b <= 5; b++){				// B = block size multiplicative
 		int threadCount = 2;
-	 	for (int pt = 1; pt <= 10; pt++){		// PT = ptreads size multiplicative
+	 	for (int pt = 1; pt <= 5; pt++){		// PT = ptreads size multiplicative
 	
 	 		std::cout<< "-------------------------" << '\n';
 	 		std::cout<< "blockCount:  " << blockCount << '\n';
@@ -39,11 +39,11 @@ void mapTester(EL &func, IN &input, OUT &output, ARGs... args){
 			int nulified = 0;
 			for (int t = 1; t <= testCount; t++) {
 				// Map skeleton
-				auto map = Map(func, threadCount);
+				auto map = Map(func, threadCount, blockCount);
 
 				// Execute Map skeleton
 				auto mapStart = std::chrono::steady_clock::now();
-				//map(output, input, args...);
+				map(output, input, args...);
 				auto mapEnd = std::chrono::steady_clock::now();
 				// Check if 0 nanoseconds have passed 
 				if ((mapEnd - mapStart).count() == 0) {

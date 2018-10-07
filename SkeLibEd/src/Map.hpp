@@ -121,9 +121,9 @@ public:
 
 		// Constructor
 		// -----------
-		MapImplementation(Elemental<EL> elemental, size_t threads) : elemental(elemental), nthreads(threads) {
-			this->nDataBlocks = 3000;
-			// this->nDataBlocks = 1; MIC! was 10
+		MapImplementation(Elemental<EL> elemental, size_t threads, size_t nblocks) : elemental(elemental), nthreads(threads) {
+			
+			this->nDataBlocks = nblocks != 0 ? nblocks : 10;
 			this->BLOCK_FLAG_INITIAL_VALUE = 1;
 		}
 
@@ -229,13 +229,13 @@ public:
 		// Friend Functions for Map Implementation Class
 		// ---------------------------------------------
 		template<typename EL2>
-		friend MapImplementation<EL2> __MapWithAccess(EL2 el, const size_t &threads);
+		friend MapImplementation<EL2> __MapWithAccess(EL2 el, const size_t &threads, const size_t &nblocks);
 	};
 
 	// Friend Functions for Map Skeleton Class
 	// ---------------------------------------
 	template<typename EL2>
-	friend MapImplementation<EL2> __MapWithAccess(EL2 el, const size_t &threads);
+	friend MapImplementation<EL2> __MapWithAccess(EL2 el, const size_t &threads, const size_t &nblocks);
 };
 
 /*
@@ -244,13 +244,13 @@ public:
 * We need a wrapper!
 */
 template<typename EL>
-MapSkeleton::MapImplementation<EL> __MapWithAccess(EL el, const size_t &threads) {
-	return MapSkeleton::MapImplementation<EL> (el, threads);
+MapSkeleton::MapImplementation<EL> __MapWithAccess(EL el, const size_t &threads, const size_t &nblocks) {
+	return MapSkeleton::MapImplementation<EL> (el, threads, nblocks);
 }
 
 template<typename EL>
-MapSkeleton::MapImplementation<EL> Map(EL el, const size_t &threads = 0) {
-	return __MapWithAccess(el, threads);
+MapSkeleton::MapImplementation<EL> Map(EL el, const size_t &threads = 0, const size_t &nblocks = 0) {
+	return __MapWithAccess(el, threads, nblocks);
 }
 
 #endif // !SLEDMAP_H
