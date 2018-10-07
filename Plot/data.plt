@@ -7,4 +7,4 @@ set title "experiment1"
 set xlabel "number of threads"
 set ylabel "exec time"
 set grid
-plot for [i=1:3] "data.dat" u (column(0)):i:xtic(i) w l title "blockSize=" + "i"
+plot for [i=1:3] "data.dat" u (column(0)):i:xtic(i) w l title "blockSize=".i
