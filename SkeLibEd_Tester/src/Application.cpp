@@ -32,8 +32,8 @@ int main()
 	
 
 	// Check output
-	for (int i = 0; i < nItems; i++)
-		std::cout << "Item [" << i << "] = " << out[i] << std::endl;
+	//for (int i = 0; i < nItems; i++)
+		std::cout << "Item [" << nItems - 1 << "] = " << out[nItems-1] << std::endl;
 
 	//normal_main();
 
