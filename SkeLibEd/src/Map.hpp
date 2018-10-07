@@ -122,7 +122,7 @@ public:
 		// Constructor
 		// -----------
 		MapImplementation(Elemental<EL> elemental, size_t threads, size_t nblocks) : elemental(elemental), nthreads(threads) {
-			
+
 			this->nDataBlocks = nblocks != 0 ? nblocks : 10;
 			this->BLOCK_FLAG_INITIAL_VALUE = 1;
 		}
@@ -133,6 +133,8 @@ public:
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 
+			//std::cout << "NBLOCKS " << nDataBlocks << "\n";
+			//std::cout << "NTHREADS" << nthreads << "\n";
 			// Optimization to best number of threads
 			// --------------------------------------
 			nthreads = nthreads ? nthreads : std::thread::hardware_concurrency();

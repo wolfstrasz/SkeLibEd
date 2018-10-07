@@ -13,23 +13,23 @@ int elemental(int a, int b) {
 // MAIN
 int main()
 {
-	int nItems = 5000;
+	size_t nItems = 100000000;
 	std::vector<int> in(nItems);
 	std::vector<int> out(nItems);
 	// input data
-	for (int i = 0; i < nItems; i++) {
+	for (size_t i = 0; i < nItems; i++) {
 		in[i] = i;
 	}
 	// elemental argument
 	int elemental_arg = 2;
 
 	// Thread test argument and Block test argument
-	testArgument ti = { 2, 32, 0, 2 };
-	testArgument bi = { 2, 16, 0, 2 };
-	int tests = 50;
+	testArgument ti = { 4, 4, 0, 2 };
+	testArgument bi = { 10, 10, 0, 2 };
+	int tests = 10;
 	TesterMap tmap(tests, ti, bi);
 	tmap.test(elemental, in, out, elemental_arg);
-	
+
 
 	// Check output
 	//for (int i = 0; i < nItems; i++)
@@ -37,5 +37,5 @@ int main()
 
 	//normal_main();
 
-	std::cin.get();
+	//std::cin.get();
 }
