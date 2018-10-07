@@ -38,7 +38,7 @@ public:
 		auto seqTime = runSeqTest(func, input, output, args...);
 		std::cout << seqTime.count() << "\n";
 		// Test parallel time
-		// ------------------S
+		// ------------------
 		auto start = std::chrono::system_clock::now();
 		auto overallTime = std::chrono::duration<double>(start - start);
 
@@ -48,23 +48,26 @@ public:
 			// Run for each thread count
 			for (ti = tArg.start; ti <= tArg.end;) {
 
-				std::cout << "---------------------------------------------" << '\n';
-				std::cout << "blockCount:      " << bi << '\n';
-				std::cout << "threadCount:     " << ti << '\n';
+
 
 				nullifiedTestCount = 0;
 				overallTime -= overallTime;
-				std::cout<< overallTime.count()<< "\n";
+				//std::cout<< overallTime.count()<< "\n";
 				// Run for number of tests per arguments
 				for (int t = 0; t < testCount; t++) {
 					overallTime += runParTest(func, input, output, args...);
-					std::cout<< overallTime.count()<< "\n";
+					//std::cout<< overallTime.count()<< "\n";
 				}
 
 				auto meanTime = overallTime.count() / (testCount - nullifiedTestCount);
-				std::cout << "meanTime:        " << meanTime << "\n";
-				std::cout << "nullified tests: " << nullifiedTestCount << "\n";
-
+				if ( (seqTime.count() / meanTime) > 3.6f) {
+					std::cout << "---------------------------------------------" << '\n';
+					std::cout << "blockCount:      " << bi << '\n';
+					std::cout << "threadCount:     " << ti << '\n';
+					std::cout << "meanTime:        " << meanTime << "\n";
+					std::cout << "advance:         " << seqTime.count() / meanTime << "\n";
+					std::cout << "nullified tests: " << nullifiedTestCount << "\n";
+				}
 				// Increase threads
 				ti += tArg.inc;
 				ti *= tArg.mul;

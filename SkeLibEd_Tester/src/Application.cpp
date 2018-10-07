@@ -5,7 +5,19 @@
 #include "TesterMap.hpp"
 //#include "normal_test.hpp"
 
+void justAMoment(size_t n = 871) {
+
+    if( n < 1 ) return;
+
+    while(n!=1) {
+
+        if(n%2) n = 3*n + 1;
+        else n = n / 2;
+    }
+}
+
 int elemental(int a, int b) {
+	justAMoment();
 	return a + b;
 }
 
@@ -13,7 +25,7 @@ int elemental(int a, int b) {
 // MAIN
 int main()
 {
-	size_t nItems = 100000000;
+	size_t nItems = 100000;
 	std::vector<int> in(nItems);
 	std::vector<int> out(nItems);
 	// input data
@@ -24,8 +36,8 @@ int main()
 	int elemental_arg = 2;
 
 	// Thread test argument and Block test argument
-	testArgument ti = { 4, 4, 0, 2 };
-	testArgument bi = { 10, 10, 0, 2 };
+	testArgument ti = { 2, 128, 0, 2 };
+	testArgument bi = { 2, 128, 0, 2 };
 	int tests = 10;
 	TesterMap tmap(tests, ti, bi);
 	tmap.test(elemental, in, out, elemental_arg);
