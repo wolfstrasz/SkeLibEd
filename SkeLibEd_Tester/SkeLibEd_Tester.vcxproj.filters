@@ -23,5 +23,8 @@
     <ClInclude Include="src\normal_test.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\TesterMap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
