@@ -16,6 +16,7 @@ std::cout << "Map timing (ns): " << std::chrono::duration_cast<std::chrono::nano
 #include <vector>
 #include <chrono>
 #include "Map.hpp"
+#include "GraphTest.hpp"
 
 struct testArgument {
 	int start;
@@ -79,16 +80,24 @@ public:
 		}
 	}
 
+	void setGrapher(Grapher &grapher){
+		this-> grapher = grapher;
+	}
 
 private:
+	// Grapher
+	Grapher grapher;
+
 	// Keep track of tests and nullified tests
 	int testCount;
 	int nullifiedTestCount;
+
 	// Keeps tracks of blocks count arguments
 	testArgument bArg;
 	int bi;
+
 	// Keeps tracks of thread count arguments
-	testArgument tArg;		// Thread test argument
+	testArgument tArg;
 	int ti;
 
 	// Test Parallel time

@@ -3,6 +3,7 @@
 #include <chrono>
 #include "skelibed.hpp"
 #include "TesterMap.hpp"
+#include "GraphTest.hpp"
 //#include "normal_test.hpp"
 
 void justAMoment(size_t n = 871) {
@@ -39,6 +40,10 @@ int main()
 	testArgument ti = { 2, 128, 0, 2 };
 	testArgument bi = { 2, 128, 0, 2 };
 	int tests = 10;
+
+    // Grapher declaration
+    Grapher_Type gr_type = Grapher_Type::PLOT_3;
+    Grapher gr(ti, bi, gr_type);
 	TesterMap tmap(tests, ti, bi);
 	tmap.test(elemental, in, out, elemental_arg);
 
