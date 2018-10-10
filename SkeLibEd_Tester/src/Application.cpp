@@ -24,9 +24,9 @@ int elemental(int a, int b) {
 
 ///////////////////////////////////////////////
 
-#define XRES 1024
-#define YRES 1024
-#define ITERMAX 100
+#define XRES 2048
+#define YRES 2048
+#define ITERMAX 1000
 FILE *outfile;
 typedef struct {
 	int r;
@@ -34,7 +34,7 @@ typedef struct {
 	int b;
 } pixel_t;
 
-FILE *outfile;
+// FILE *outfile;
 
 pixel_t mandel(int taskid) {
 
@@ -92,23 +92,23 @@ int main()
 	}
 	std::vector<pixel_t> image(in.size());
 
-	// Output results
-	outfile = fopen("custompicture.ppm", "w");
-	fprintf(outfile, "P6\n# CREATOR: Eric R Weeks / mandel program\n");
-	fprintf(outfile, "%d %d\n255\n", YRES, XRES);
-	for (size_t i = 0; i<XRES*YRES; i++) {
-		fputc((char)image[i].r, outfile);
-		fputc((char)image[i].g, outfile);
-		fputc((char)image[i].b, outfile);
-	}
+	// // Output results
+	// outfile = fopen("custompicture.ppm", "w");
+	// fprintf(outfile, "P6\n# CREATOR: Eric R Weeks / mandel program\n");
+	// fprintf(outfile, "%d %d\n255\n", YRES, XRES);
+	// for (size_t i = 0; i<XRES*YRES; i++) {
+	// 	fputc((char)image[i].r, outfile);
+	// 	fputc((char)image[i].g, outfile);
+	// 	fputc((char)image[i].b, outfile);
+	// }
 
 	// Thread test argument and Block test argument
-	testArgument ti = { 2, 32, 0, 2 };
-	testArgument bi = { 2, 32, 0, 2 };
-	int tests = 10;
+	testArgument ti = { 2, 256, 0, 2 };
+	testArgument bi = { 2, 1024 , 0, 2 };
+	int tests = 5;
 
 	// Grapher declaration
-	TesterMap tmap("Mandelbrot 1024", tests, ti, bi);
+	TesterMap tmap("Mandelbrot 2048 1000", tests, ti, bi);
 	tmap.test(mandel, in, image);
 
 	// Check output
