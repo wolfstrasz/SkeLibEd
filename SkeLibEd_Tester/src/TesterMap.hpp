@@ -69,14 +69,13 @@ public:
 				long double speedUp = seqTiming / parTiming;
 				data_file << std::to_string(ti) + "\t" + std::to_string(bi) + "\t" + std::to_string(parTiming) + "\n";
 				data_file2 << std::to_string(ti) + "\t" + std::to_string(bi) + "\t" + std::to_string(speedUp) + "\n";
-				/*if ( (seqTime.count() / meanTime) > 3.6f) {
 					std::cout << "---------------------------------------------" << '\n';
 					std::cout << "threadCount:     " << ti << '\n';
 					std::cout << "blockCount:      " << bi << '\n';
 					std::cout << "meanTime:        " << parTiming << "\n";
 					std::cout << "advance:         " << seqTiming / parTiming << "\n";
 					std::cout << "nullified tests: " << nullifiedTestCount << "\n";
-				}*/
+			
 				// Increase threads
 				bi += bArg.inc;
 				bi *= bArg.mul;
