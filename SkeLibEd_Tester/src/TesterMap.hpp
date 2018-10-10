@@ -38,7 +38,7 @@ public:
 	void test(EL &func, std::vector<IN> &input, std::vector<OUT> &output, ARGs... args) {
 		size = input.size();
 		initDataFiles();
-		
+
 		// Test sequential time
 		auto seqTime = runSeqTest(func, input, output, args...);
 		seqTiming = seqTime.count();
@@ -52,6 +52,11 @@ public:
 		// Run for thread count
 		for (ti = tArg.start; ti <= tArg.end;) {
 
+			data_file << std::to_string(ti)<< '\t' ;
+			data_file2 << std::to_string(ti) << '\t';
+
+			data_file << std::to_string(seqTiming) << '\t';
+			data_file2 << std::to_string((double)1.0) << '\t';
 			// Run for each thread count
 			for (bi = bArg.start; bi <= bArg.end;) {
 
@@ -67,25 +72,29 @@ public:
 				long double meanTime = overallTime.count() / (testCount - nullifiedTestCount);
 				parTiming = (long double)meanTime;
 				long double speedUp = seqTiming / parTiming;
-				data_file << std::to_string(ti) + "\t" + std::to_string(bi) + "\t" + std::to_string(parTiming) + "\n";
-				data_file2 << std::to_string(ti) + "\t" + std::to_string(bi) + "\t" + std::to_string(speedUp) + "\n";
+				data_file << std::to_string(parTiming) << '\t';
+				data_file2 << std::to_string(speedUp) << '\t';
+
+				//data_file << std::to_string(ti) + "\t" + std::to_string(bi) + "\t" + std::to_string(parTiming) + "\n";
+				//data_file2 << std::to_string(ti) + "\t" + std::to_string(bi) + "\t" + std::to_string(speedUp) + "\n";
 					std::cout << "---------------------------------------------" << '\n';
 					std::cout << "threadCount:     " << ti << '\n';
 					std::cout << "blockCount:      " << bi << '\n';
 					std::cout << "meanTime:        " << parTiming << "\n";
 					std::cout << "advance:         " << seqTiming / parTiming << "\n";
 					std::cout << "nullified tests: " << nullifiedTestCount << "\n";
-			
+
 				// Increase threads
 				bi += bArg.inc;
 				bi *= bArg.mul;
 			}
-
+			data_file << '\n';
+			data_file2 << '\n';
 			// Increase blocks
 			ti += tArg.inc;
 			ti *= tArg.mul;
 
-			
+
 		}
 		initPlotter();
 		closeFiles();
@@ -93,6 +102,7 @@ public:
 
 private:
 	// File to keep data
+	int columncounter = 0;
 	long double seqTiming, parTiming;
 	std::string test_name;
 	std::string file_name;
@@ -101,6 +111,7 @@ private:
 	std::ofstream data_file;
 	std::ofstream data_file2;
 	std::ofstream plotter_file;
+	std::ofstream plotter_file2;
 	long long size = 0;
 
 	// Keep track of tests and nullified tests
@@ -152,17 +163,24 @@ private:
 
 	// Init data file
 	void initDataFiles() {
-		
-		file_name = test_name + "_" 
-			+ std::to_string(size) + "_"
-			+ "T-" + std::to_string(tArg.start) + "-" + std::to_string(tArg.end) + "_"
-			+ "B-" + std::to_string(bArg.start) + "-" + std::to_string(bArg.end) + "_"
-			+ std::to_string(std::thread::hardware_concurrency());
+		columncounter = 1;
+		file_name = test_name;
 		time_file = file_name +"_time.dat";
 		speedup_file = file_name + "_speedup.dat";
 		data_file.open(time_file);
 		data_file2.open(speedup_file);
 
+		data_file << "Threads" << '\t' << "Seq.time" << '\t' ;
+		data_file2 << "Threads" << '\t' << "Seq.time" << '\t' ;
+		for (int i = bArg.start; i <= bArg.end;){
+			data_file << "Blocks=" << std::to_string(i) << '\t';
+			data_file2 << "Blocks=" << std::to_string(i) << '\t';
+			i += bArg.inc;
+			i *= bArg.mul;
+			columncounter ++;
+		}
+		data_file << '\n';
+		data_file2 << '\n';
 		//data_file.close();
 		//data_file2.close();
 	}
@@ -170,34 +188,52 @@ private:
 	void initPlotter() {
 		data_file.close();
 		data_file2.close();
-		std::string plotter_name = "plot_last.plt";
+		std::string plotter_name = "plot_time.plt";
+		std::string plotter_name2 = "plot_speedup.plt";
+
+
+		// PLOT TIME
 		plotter_file.open(plotter_name);
-		//plotter_file << "# plotting last test" + '\n';
-		plotter_file << "set multiplot" << '\n';
 		plotter_file << "set terminal pngcairo enhanced font \"arial, 10\" fontscale 1.0 size 600, 400" << '\n';
-		plotter_file << "set xlabel \"threads\" " << '\n';
-		plotter_file << "set ylabel \"block count\" " << '\n';
-		plotter_file << "set xtics border " + std::to_string(tArg.start) << ", 1, " << std::to_string(tArg.end) << '\n';
-		plotter_file << "set ytics border " + std::to_string(bArg.start) << ", 1, " << std::to_string(bArg.end) << '\n';
-		plotter_file << "set view 10,75" << '\n';
-		plotter_file << "set dgrid3d" << '\n';
-		plotter_file << "set hidden3d" << '\n';
+		plotter_file << "set xlabel \"threads\" rotate parallel" << '\n';
+		plotter_file << "set ylabel \"execution time\" rotate parallel" << '\n';
+		plotter_file << "set logscale x" << '\n';
 		plotter_file << "set title \"Problem: " << test_name << "\\n"
 			<< "Tests per AVG: " << std::to_string(testCount) << "\\n"
 			<< "Input size: " << std::to_string(size) << "\\n"
 			<< "CPUs: " << std::to_string(std::thread::hardware_concurrency()) << "\\n"
 			<< "Seq. Time: " << std::to_string(seqTiming) << "\"" << '\n';
-		plotter_file << "set output \"" << file_name << ".png\"" << '\n';
+		plotter_file << "set output \"" << file_name << "_time" << ".png\"" << '\n';
 
-		// Plot time
-		plotter_file << "set zlabel \"exec. time\"" << '\n';
-		plotter_file << "splot \"" << time_file << "\""
-			<< " using 1:2:3 title \"execution time\" with lines" << '\n';
+		plotter_file << "set key autotitle columnhead \n";
+		plotter_file << "set key outside \n";
+		plotter_file << "set linestyle 1 lt 16 lw 2 \n";
+		plotter_file << "set key box linestyle 1 \n";
 
-		// Plot speedup
-		plotter_file << "set zlabel \"speedup\"" << '\n';
-		plotter_file << "splot \"" + speedup_file << "\""
-			<< " using 1:2:3 title \"speedup\" with lines" << '\n';
+		plotter_file << "plot " << "for[i=2:" << std::to_string(columncounter+1) << "] \""
+		<< time_file << "\"" << " using 1:i:xtic(1) with lines" << '\n';
+
+		// PLOT speedup
+		plotter_file2.open(plotter_name2);
+		plotter_file2 << "set terminal pngcairo enhanced font \"arial, 10\" fontscale 1.0 size 600, 400" << '\n';
+		plotter_file2 << "set xlabel \"threads\" rotate parallel" << '\n';
+		plotter_file2 << "set ylabel \"speedup\" rotate parallel" << '\n';
+		plotter_file2 << "set logscale x" << '\n';
+		plotter_file2 << "set title \"Problem: " << test_name << "\\n"
+			<< "Tests per AVG: " << std::to_string(testCount) << "\\n"
+			<< "Input size: " << std::to_string(size) << "\\n"
+			<< "CPUs: " << std::to_string(std::thread::hardware_concurrency()) << "\\n"
+			<< "Seq. Time: " << std::to_string(seqTiming) << "\"" << '\n';
+		plotter_file2 << "set output \"" << file_name << "_speedup" << ".png\"" << '\n';
+
+		plotter_file2 << "set key autotitle columnhead \n";
+		plotter_file2 << "set key outside \n";
+		plotter_file2 << "set linestyle 1 lt 16 lw 2 \n";
+		plotter_file2 << "set key box linestyle 1 \n";
+
+		plotter_file2 << "plot " << "for[i=2:" << std::to_string(columncounter+1) << "] \""
+		<< speedup_file << "\"" << " using 1:i:xtic(1) with lines" << '\n';
+
 	}
 
 	void closeFiles() {

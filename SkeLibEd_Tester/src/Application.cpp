@@ -25,7 +25,7 @@ int elemental(int a, int b) {
 // MAIN
 int main()
 {
-	size_t nItems = 100000;
+	size_t nItems = 1000000;
 	std::vector<int> in(nItems);
 	std::vector<int> out(nItems);
 	// input data
@@ -36,12 +36,12 @@ int main()
 	int elemental_arg = 2;
 
 	// Thread test argument and Block test argument
-	testArgument ti = { 2, 32, 0, 2 };
-	testArgument bi = { 2, 32, 0, 2 };
-	int tests = 100;
+	testArgument ti = { 1, 1024, 0, 2 };
+	testArgument bi = { 1, 1024, 0, 2 };
+	int tests = 10;
 
     // Grapher declaration
-	TesterMap tmap("colatz 271", tests, ti, bi);
+	TesterMap tmap("colatz271", tests, ti, bi);
 	tmap.test(elemental, in, out, elemental_arg);
 
 
@@ -51,5 +51,5 @@ int main()
 
 	//normal_main();
 
-	std::cin.get();
+	//std::cin.get();
 }
