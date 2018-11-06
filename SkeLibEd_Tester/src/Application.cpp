@@ -3,6 +3,26 @@
 #include <chrono>
 #include <fstream>
 #include "skelibed.hpp"
+#include "DynamicMap.hpp"
+#include "dynamictest.hpp"
+
+
+
+
+
+int main (){
+
+    std::cout<<"DYNAMIC TEST: " <<std::endl;
+    dynamictest();
+    //std::cin.get();
+    return 0;
+}
+
+
+
+
+
+
 //#include "TesterMap.hpp"
 //#include "normal_test.hpp"
 //
@@ -64,8 +84,8 @@
 //	return pixel;
 //}
 //// MAIN
-int main()
-{
+//int main()
+//{
 	//size_t nItems = 100000;
 	//std::vector<int> in(nItems);
 	//std::vector<int> out(nItems);
@@ -118,4 +138,4 @@ int main()
 	//normal_main();
 
 	//std::cin.get();
-}
+//}
