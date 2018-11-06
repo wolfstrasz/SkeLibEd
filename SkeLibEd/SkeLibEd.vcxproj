@@ -120,6 +120,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\DynamicMap.hpp" />
     <ClInclude Include="src\Scan.hpp" />
     <ClInclude Include="src\Map.hpp" />
     <ClInclude Include="src\MapReduce.hpp" />
