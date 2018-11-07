@@ -118,8 +118,9 @@ public:
 		// -----------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
-			std::cout << "Thread count: " <<nthreads<< std::endl;
-
+			//std::cout << "Thread count: " <<nthreads<< std::endl;
+		//	std::cout << "Size of chunk: "<<sizeOfChunk<<std::endl;
+		//	std::cout << "Imput size: "<<input.size()<<std::endl;
 			Scoreboard *scoreboard = new Scoreboard;
 
 			scoreboard->isFinished = false;
@@ -147,13 +148,20 @@ public:
 
 				threadArguments[t].input = &input;
 				threadArguments[t].output = &tempOutput;
-				threadArguments[t].isThereWork = true;
-				threadArguments[t].elementsCount = scoreboard->itemsCount;
-				threadArguments[t].threadInputIndex = scoreboard->curIndex;
+		//		threadArguments[t].isThereWork = true;
+			//	threadArguments[t].elementsCount = scoreboard->itemsCount;
+				//threadArguments[t].threadInputIndex = scoreboard->curIndex;
 				//chunkIndex += sizeOfChunk;
-				scoreboard->curIndex += scoreboard->itemsCount;
-				scoreboard->sentJobs ++;
+			//	scoreboard->curIndex += scoreboard->itemsCount;
+				//scoreboard->sentJobs ++;
+
+				threadArguments[t].isThereWork = false;
+				scoreboard->finishedWorkers.push(t);
 			}
+			scoreboard->sentJobs = nthreads;
+
+		//	std::cout << "sentJobs: "<<scoreboard->sentJobs<<std::endl;
+		//	std::cout << "finishedJobs: "<< scoreboard->finishedJobs<<std::endl;
 			// Run threads
 			// -----------
 			for (size_t t = 0; t< nthreads; t++)
@@ -169,28 +177,35 @@ public:
 					size_t threadID = scoreboard->finishedWorkers.front();
 					scoreboard->finishedWorkers.pop();
 					scoreboard->finishedJobs ++;
+					//std::cout << "finishedJobs: "<< scoreboard->finishedJobs<<std::endl;
 					if (scoreboard->curIndex == scoreboard->inputSize){
 
 					} else if (scoreboard->curIndex + scoreboard->itemsCount < scoreboard->inputSize) {
 						threadArguments[threadID].elementsCount = scoreboard->itemsCount;
 						threadArguments[threadID].threadInputIndex = scoreboard->curIndex;
 						scoreboard->curIndex += scoreboard->itemsCount;
+						scoreboard->sentJobs ++;
+				//		std::cout << "sentJobs: "<<scoreboard->sentJobs<<std::endl;
 						threadArguments[threadID].isThereWork = true;
 					} else {
 						size_t lastItemsCount = scoreboard->inputSize - scoreboard->curIndex;
 						threadArguments[threadID].elementsCount = lastItemsCount;
 						threadArguments[threadID].threadInputIndex = scoreboard->curIndex;
 						scoreboard->curIndex += lastItemsCount;
+						scoreboard->sentJobs ++;
+					//	std::cout << "sentJobs: "<<scoreboard->sentJobs<<std::endl;
 						threadArguments[threadID].isThereWork = true;
 					}
 				}
 
 				// Check if job will be finished
-				if (scoreboard->finishedJobs == scoreboard->sentJobs)
+				if (scoreboard->finishedJobs == scoreboard->sentJobs )
 					scoreboard->isFinished = true;
 
 			}
 
+		//	std::cout << "At end sentJobs: "<<scoreboard->sentJobs<<std::endl;
+	//		std::cout << "At end finishedJobs: "<< scoreboard->finishedJobs<<std::endl;
 			// Join threads
 			// ------------
 			for (size_t t = 0; t< nthreads; ++t) { THREADS[t]->join(); delete THREADS[t]; }
