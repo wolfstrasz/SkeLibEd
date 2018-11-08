@@ -10,15 +10,9 @@
 #include <string>
 
 
-#define tm_XRES 2048
-#define tm_YRES 2048
 #define tm_ITERMAX 1000
-#define tm_Items 10000000
-#define tm_threads 4
-#define tm_blocks 32
-#define tm_magnify 1.0f
-
 #define tm_testCount 10
+
 // COLATZ
 // ---------------------------------------------
 void tm_justAMoment(size_t n = 871) {
@@ -47,7 +41,7 @@ typedef struct {
 	int b;
 } tm_pixel_t;
 
-tm_pixel_t mandel(int taskid, double magnification) {
+tm_pixel_t mandel(int taskid, double magnification, size_t tm_XRES, size_t tm_YRES) {
 
 	tm_pixel_t pixel;
 	double x, xx, y, cx, cy;
@@ -78,32 +72,34 @@ tm_pixel_t mandel(int taskid, double magnification) {
 
 // APPLICATION
 // --------------------------------------------
-void TestMaps(int flag) {
+void TestMaps(int flag, size_t threadcount, size_t blockcount, size_t icx, size_t icy, double arg) {
 
 	auto start = std::chrono::system_clock::now();
+	size_t itemcount = icx * icy;
 
 	if (flag == 1) {
 		// TEST COLATZ
 		// ----------------------------------------------
 		// output file
-		std::string outfileName = std::to_string(tm_threads) + "T_" + std::to_string(tm_blocks) + "B_" + std::to_string(tm_Items) + "I";
+		std::string outfileName = "colatz871" + std::to_string(threadcount) + "T_"
+			+ std::to_string(blockcount) + "B_" + std::to_string(itemcount) + "I";
 		std::ofstream outfile;
 		outfile.open(outfileName);
 
 		// initialisation
-		std::vector<int> colatzIn(tm_Items);
-		std::vector<int> colatzSeqOut(tm_Items);
-		std::vector<int> colatzDynMapOut(tm_Items);
-		std::vector<int> colatzMapOut(tm_Items);
+		std::vector<int> colatzIn(itemcount);
+		std::vector<int> colatzSeqOut(itemcount);
+		std::vector<int> colatzDynMapOut(itemcount);
+		std::vector<int> colatzMapOut(itemcount);
 
-		int sumArg = 123;
-		for (size_t i = 0; i < tm_Items; i++) {
+		int sumArg = arg;
+		for (size_t i = 0; i < itemcount; i++) {
 			colatzIn[i] = i;
 		}
 
 		// Sequantial
 		auto start = std::chrono::system_clock::now();
-		for (size_t i = 0; i < tm_Items; i++) {
+		for (size_t i = 0; i < itemcount; i++) {
 			colatzSeqOut[i] = colatz(colatzIn[i], sumArg);
 		}
 		auto end = std::chrono::system_clock::now();
@@ -114,10 +110,10 @@ void TestMaps(int flag) {
 
 		//Dynamic Map
 		resultTime = end - end;
-		for (int test = 0; test < tm_testCount ; test ++){
+		for (size_t test = 0; test < tm_testCount ; test ++){
 			auto start = std::chrono::system_clock::now();
 
-			auto dynamicMap = DynamicMap(colatz, tm_threads, tm_Items / (tm_blocks));
+			auto dynamicMap = DynamicMap(colatz, threadcount, itemcount / (blockcount * threadcount));
 			dynamicMap(colatzDynMapOut, colatzIn, sumArg);
 
 			auto end = std::chrono::system_clock::now();
@@ -127,10 +123,10 @@ void TestMaps(int flag) {
 
 		// Static Map
 		resultTime = end - end;
-		for (int test = 0; test < tm_testCount ; test ++){
+		for (size_t test = 0; test < tm_testCount ; test ++){
 			auto start = std::chrono::system_clock::now();
 
-			auto map = Map(colatz, tm_threads, tm_blocks);
+			auto map = Map(colatz, threadcount, blockcount);
 			map(colatzMapOut, colatzIn, sumArg);
 
 			auto end = std::chrono::system_clock::now();
@@ -138,41 +134,68 @@ void TestMaps(int flag) {
 		}
 		outfile << "SMAP: " << std::to_string (resultTime.count() / tm_testCount)<<std::endl;
 
-		for (int i = 0 ; i<tm_Items ; i+=10000){
+		for (size_t i = 0 ; i< itemcount; i+=10000){
 			if (colatzDynMapOut[i] != colatzSeqOut[i])std::cout<<i<<std::endl;
-
 		}
 		outfile.close();
 	}
 
-	// if (flag == 2) {
-	//
-	// 	// MANDELBROT
-	// 	// -----------------------------------------------
-	//
-	// 	size_t nItems = tm_XRES * tm_YRES;
-	// 	std::vector <int> manIn(nItems);
-	// 	std::vector <tm_pixel_t> manDynMapOut(nItems);
-	// 	std::vector <tm_pixel_t> manMapOut(nItems);
-	// 	std::vector <tm_pixel_t> manSeqOut(nItems);
-	// 	for (int i = 0; i < nItems; i++) {
-	// 		manIn[i] = i;
-	// 	}
-	//
-	// 	// Sequantial
-	// 	for (int i = 0; i < nItems; i++) {
-	// 		manSeqOut[i] = mandel(manIn[i], tm_magnify);
-	// 	}
-	//
-	// 	// Dynamic map
-	// 	auto dynamicMap = DynamicMap(mandel, tm_threads, tm_Items / tm_blocks);
-	// 	dynamicMap(manDynMapOut, manIn, tm_magnify);
-	//
-	// 	// Static Map
-	// 	auto map = Map(mandel, tm_threads, tm_blocks);
-	// 	map(manDynMapOut, manIn, tm_magnify);
-	//
-	// }
+	 if (flag == 2) {
+	
+	 	// MANDELBROT
+	 	// -----------------------------------------------
+		 std::string outfileName = "mandel" + std::to_string((int)arg) + "_" + std::to_string(threadcount) + "T_"
+			 + std::to_string(blockcount) + "B_" + std::to_string(itemcount) + "I";
+		 std::ofstream outfile;
+		 outfile.open(outfileName);
+
+
+		 //initialisation
+	 	std::vector <int> manIn(itemcount);
+	 	std::vector <tm_pixel_t> manDynMapOut(itemcount);
+	 	std::vector <tm_pixel_t> manMapOut(itemcount);
+	 	std::vector <tm_pixel_t> manSeqOut(itemcount);
+	 	for (size_t i = 0; i < itemcount; i++) {
+	 		manIn[i] = i;
+	 	}
+	
+	 	// Sequantial
+		auto start = std::chrono::system_clock::now();
+	 	for (size_t i = 0; i < itemcount; i++) {
+	 		manSeqOut[i] = mandel(manIn[i], arg);
+	 	}
+		auto end = std::chrono::system_clock::now();
+		std::chrono::duration<double, std::milli> resultTime = end - start;
+
+		outfile << "SEQ: " << std::to_string(resultTime.count()) << std::endl;
+
+
+	 	// Dynamic map
+		resultTime = end - end;
+		for (size_t test = 0; test < tm_testCount; test++) {
+			auto start = std::chrono::system_clock::now();
+
+			auto dynamicMap = DynamicMap(mandel, threadcount, itemcount / (blockcount * threadcount));
+			dynamicMap(manDynMapOut, manIn, arg, icx, icx);
+
+			auto end = std::chrono::system_clock::now();
+			resultTime += (end - start);
+		}
+
+	 	// Static Map
+		outfile << "DMAP: " << std::to_string(resultTime.count() / tm_testCount) << std::endl;
+		for (size_t test = 0; test < tm_testCount; test++) {
+			auto start = std::chrono::system_clock::now();
+
+			auto map = Map(mandel, threadcount, blockcount);
+			map(manDynMapOut, manIn, arg, icx, icy);
+
+			auto end = std::chrono::system_clock::now();
+			resultTime += (end - start);
+		}
+		outfile << "SMAP: " << std::to_string(resultTime.count() / tm_testCount) << std::endl;
+
+	 }
 }
 
 

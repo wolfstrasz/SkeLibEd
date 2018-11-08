@@ -136,6 +136,7 @@
   <ItemGroup>
     <ClInclude Include="src\normal_test.hpp" />
     <ClInclude Include="src\TesterMap.hpp" />
+    <ClInclude Include="src\TestMaps.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

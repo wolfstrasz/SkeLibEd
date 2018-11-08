@@ -8,9 +8,16 @@
 #include "TestMaps.hpp"
 
 
-int main(){
+int main(char* argv[]){
+	int func = strtol(argv[1], nullptr, 0);
+	int thrc = strtol(argv[2], nullptr, 0);
+	int blkc = strtol(argv[3], nullptr, 0);
+	int ixc = strtol(argv[4], nullptr, 0);
+	int iyc = strtol(argv[5], nullptr, 0);
+	double arg = strtod(argv[6], nullptr);
 
-    TestMaps(1);
+
+   // TestMaps(func, thrc, blkc, ixc,iyc,arg);
 
 return 0;
 }
