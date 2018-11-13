@@ -21,13 +21,17 @@ int main(char* argv[]){
 	thrc  = strtol(argv[index++], nullptr, 0);
 	blkc  = strtol(argv[index++], nullptr, 0);
 	ic    = strtol(argv[index++], nullptr, 0);
-	iters = strtol(argv[index++], nullptr, 0);
-	arg   = strtod(argv[index++], nullptr);
+	if (func != 1) {
+		iters = strtol(argv[index++], nullptr, 0);
+	}
+	if (func != 3) {
+		arg = strtod(argv[index++], nullptr);
+	}
 
 	std::cout << "TEST:    " << func << std::endl;		// test functionality
 	std::cout << "THREADS: " << thrc << std::endl;		// number of threads
 	std::cout << "BLOCKS:  " << blkc << std::endl;		// number of blocks
-	std::cout << "IXC:     " << ic << std::endl;		// number of items in a dimension
+	std::cout << "IC:      " << ic << std::endl;		// number of items in a dimension
 	std::cout << "ITERS:   " << iters << std::endl;		// number of iterations
 	std::cout << "ARG:     " << arg << std::endl;		// additional arg
 
@@ -38,7 +42,7 @@ int main(char* argv[]){
 		mandelbrot::test(thrc, blkc, ic, ic, iters, arg);
 	}
 	else if (func == 3) {
-		nbody::test(thrc, blkc, ixc, iyc);
+		nbody::test(thrc, blkc, ic, iters);
 	}
 
 return 0;

@@ -176,6 +176,7 @@ namespace nbody {
 		outfile << "SMAP: " << std::to_string(time.count()) << std::endl;
 
 		// test dynamic map
+		// ----------------------------------------------
 		start = std::chrono::system_clock::now();
 		dnbody(sParticles);
 		end = std::chrono::system_clock::now();
