@@ -7,7 +7,7 @@
 #include "TestMandelbrot.hpp"
 #include "TestNBody.hpp"
 
-int main(char* argv[]){
+int main(int argc, char* argv[]){
 
 	size_t func = 0;
 	size_t thrc = 0;

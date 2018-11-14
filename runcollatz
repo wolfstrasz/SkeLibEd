@@ -1,0 +1,7 @@
+#!/bin/bash
+echo "TESTING COLLATZ"
+
+echo "./run.out 1 2 8 10000000 2.0"
+./run.out 1 2 8 10000000 2.0
+
+

@@ -32,7 +32,7 @@ echo ""
 # Compile using GCC
 echo "Compiling Application using GCC: "
 echo "(LSTDC++)(STD=C++11)(LPTHREADS)..."
-gcc LinuxLib/Application.cpp -lstdc++ -std=c++11 -lpthread -o run.out
+gcc LinuxLib/Application.cpp -lstdc++ -std=c++11 -lpthread -lm -o run.out
 echo "...Finished Compiling."
 echo "=> Output executable: run.out"
 echo "======================================"
