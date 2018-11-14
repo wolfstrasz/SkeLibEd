@@ -164,6 +164,7 @@ public:
 		//	std::cout << "finishedJobs: "<< scoreboard->finishedJobs<<std::endl;
 			// Run threads
 			// -----------
+			std::cout << "RUNNING THREADS" << std::endl;
 			for (size_t t = 0; t< nthreads; t++)
 				THREADS[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, scoreboard, threadArguments, t, args...);
 
@@ -203,7 +204,7 @@ public:
 					scoreboard->isFinished = true;
 
 			}
-
+			std::cout << "FINISHED THREADS" << std::endl;
 		//	std::cout << "At end sentJobs: "<<scoreboard->sentJobs<<std::endl;
 	//		std::cout << "At end finishedJobs: "<< scoreboard->finishedJobs<<std::endl;
 			// Join threads
