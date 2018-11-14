@@ -52,6 +52,7 @@ public:
 			std::queue <size_t> finishedWorkers;
 			int finishedJobs;
 			int sentJobs;
+			std::mutex scoreboardInUse;
 		};
 
 		// ThreadArgument
@@ -99,7 +100,9 @@ public:
 					}
 
 					threadArguments[threadID].isThereWork = false;
+					while (!scoreboard->scoreboardInUse.try_lock());
 					scoreboard->finishedWorkers.push(threadID);
+					scoreboard->scoreboardInUse.unlock();
 				}
 			}
 
