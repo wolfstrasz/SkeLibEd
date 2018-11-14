@@ -127,6 +127,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\TestCollatz.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SkeLibEd\SkeLibEd.vcxproj">
@@ -136,7 +137,9 @@
   <ItemGroup>
     <ClInclude Include="src\normal_test.hpp" />
     <ClInclude Include="src\TesterMap.hpp" />
+    <ClInclude Include="src\TestMandelbrot.hpp" />
     <ClInclude Include="src\TestMaps.hpp" />
+    <ClInclude Include="src\TestNBody.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
