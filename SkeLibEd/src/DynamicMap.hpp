@@ -159,9 +159,9 @@ public:
 				scoreboard->finishedWorkers.push(t);
 			}
 			scoreboard->sentJobs = nthreads;
-
-		//	std::cout << "sentJobs: "<<scoreboard->sentJobs<<std::endl;
-		//	std::cout << "finishedJobs: "<< scoreboard->finishedJobs<<std::endl;
+			//std::cout << "SENT JOBS: " <<scoreboard->sentJobs<< std::endl;
+			std::cout << "sentJobs: "<<scoreboard->sentJobs<<std::endl;
+			std::cout << "finishedJobs: "<< scoreboard->finishedJobs<<std::endl;
 			// Run threads
 			// -----------
 			std::cout << "RUNNING THREADS" << std::endl;
@@ -178,7 +178,7 @@ public:
 					size_t threadID = scoreboard->finishedWorkers.front();
 					scoreboard->finishedWorkers.pop();
 					scoreboard->finishedJobs ++;
-					//std::cout << "finishedJobs: "<< scoreboard->finishedJobs<<std::endl;
+					std::cout << "finishedJobs: "<< scoreboard->finishedJobs<<std::endl;
 					if (scoreboard->curIndex == scoreboard->inputSize){
 
 					} else if (scoreboard->curIndex + scoreboard->itemsCount < scoreboard->inputSize) {
@@ -186,7 +186,7 @@ public:
 						threadArguments[threadID].threadInputIndex = scoreboard->curIndex;
 						scoreboard->curIndex += scoreboard->itemsCount;
 						scoreboard->sentJobs ++;
-				//		std::cout << "sentJobs: "<<scoreboard->sentJobs<<std::endl;
+						std::cout << "sentJobs: "<<scoreboard->sentJobs<<std::endl;
 						threadArguments[threadID].isThereWork = true;
 					} else {
 						size_t lastItemsCount = scoreboard->inputSize - scoreboard->curIndex;
@@ -194,7 +194,7 @@ public:
 						threadArguments[threadID].threadInputIndex = scoreboard->curIndex;
 						scoreboard->curIndex += lastItemsCount;
 						scoreboard->sentJobs ++;
-					//	std::cout << "sentJobs: "<<scoreboard->sentJobs<<std::endl;
+						std::cout << "sentJobs: "<<scoreboard->sentJobs<<std::endl;
 						threadArguments[threadID].isThereWork = true;
 					}
 				}
@@ -205,8 +205,8 @@ public:
 
 			}
 			std::cout << "FINISHED THREADS" << std::endl;
-		//	std::cout << "At end sentJobs: "<<scoreboard->sentJobs<<std::endl;
-	//		std::cout << "At end finishedJobs: "<< scoreboard->finishedJobs<<std::endl;
+			std::cout << "At end sentJobs: "<<scoreboard->sentJobs<<std::endl;
+			std::cout << "At end finishedJobs: "<< scoreboard->finishedJobs<<std::endl;
 			// Join threads
 			// ------------
 			for (size_t t = 0; t< nthreads; ++t) { THREADS[t]->join(); delete THREADS[t]; }
