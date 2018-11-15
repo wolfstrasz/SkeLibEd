@@ -121,6 +121,8 @@ namespace nbody {
 		// particle vectors initialization
 		nbody_init(particles, indices, np);
 
+		std::cout<<" SIZES " << np << " : " << iterations << std::endl;
+
 		for (size_t i = 0; i < iterations; i += 2) {
 			nbody_simulate_step(doublebuffer, indices, particles);
 			nbody_simulate_step(particles, indices, doublebuffer);
@@ -144,6 +146,7 @@ namespace nbody {
 		// particle vectors initialization
 		nbody_init(particles, indices, np);
 
+		std::cout<<" SIZES " << np << " : " << iterations << std::endl;
 		for (size_t i = 0; i < iterations; i += 2) {
 			nbody_simulate_step(doublebuffer, indices, particles);
 			nbody_simulate_step(particles, indices, doublebuffer);
@@ -152,16 +155,21 @@ namespace nbody {
 
 
 	void test(size_t threadcount, size_t blockcount, size_t np, size_t iters) {
+		std::cout << "THREADS: " << threadcount << std::endl;		// number of threads
+		std::cout << "BLOCKS:  " << blockcount << std::endl;		// number of blocks
+		std::cout << "IC:      " << np << std::endl;		// number of items in a dimension
+		std::cout << "ITERS:   " << iters << std::endl;		// number of iterations
+
 		// Output file
 		std::string outfileName = "nbody_" + std::to_string(threadcount) + "T_"
-			+ std::to_string(blockcount) + "B_" + std::to_string(np) + "P_" = std::to_string(iters) + "IT";
+			+ std::to_string(blockcount) + "B_" + std::to_string(np) + "P_" + std::to_string(iters) + "IT";
 		std::ofstream outfile;
 		outfile.open(outfileName);
 
 		// initialisation
 		threads = threadcount;
 		blocks = blockcount;
-		iterations = iterations;
+		iterations = iters;
 		std::vector<Particle> sParticles(np);
 		std::vector<Particle> dParticles = sParticles;
 

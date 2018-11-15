@@ -2,7 +2,7 @@
 echo "TESTING NBODY"
 
 echo "10^6 items in 4 cores"
-echo "./run.out 3 8 16 1000000 1000"
-./run.out 3 8 16 1000000 1000
+echo "./run.out 3 8 16 10000 1000"
+./run.out 3 8 16 10000 20
 
 
