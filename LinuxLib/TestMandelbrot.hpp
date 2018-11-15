@@ -78,6 +78,8 @@ namespace mandelbrot {
 		// Static Map
 		// ----------------------------------------------------------
 		for (size_t test = 0; test < mandelbrot_testcount; test++) {
+			std::cout << "STATIC MAP Test: " << test << std::endl;
+
 			auto start = std::chrono::system_clock::now();
 
 			auto map = Map(mandelbrot_elemental, threadcount, blockcount);
@@ -94,6 +96,8 @@ namespace mandelbrot {
 		// Dynamic map
 		// ----------------------------------------------------------
 		for (size_t test = 0; test < mandelbrot_testcount; test++) {
+			std::cout << "DYNAMIC MAP Test: " << test << std::endl;
+
 			auto start = std::chrono::system_clock::now();
 
 			auto dynamicMap = DynamicMap(mandelbrot_elemental, threadcount, itemcount / (blockcount * threadcount));

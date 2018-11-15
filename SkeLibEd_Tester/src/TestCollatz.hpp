@@ -2,7 +2,8 @@
 #define _TEST_COLLATZ_HPP
 
 #include "Map.hpp"
-#include "DynamicMap.hpp"
+//#include "DynamicMap.hpp"
+#include "DynamicMap2.hpp"
 #include <chrono>
 #include <iostream>
 #include <fstream>

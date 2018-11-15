@@ -1,0 +1,64 @@
+#!/bin/bash
+echo "TESTING COLLATZ"
+
+echo "10^6 items in 4 core"
+echo "./run.out 1 2 8 1000000 2.0"
+./run.out 1 2 8 1000000 2.0
+
+echo "./run.out 1 2 16 1000000 2.0"
+./run.out 1 2 16 1000000 2.0
+
+echo "./run.out 1 2 32 1000000 2.0"
+./run.out 1 2 32 1000000 2.0
+
+echo "./run.out 1 2 64 1000000 2.0"
+./run.out 1 2 64 1000000 2.0
+
+echo "./run.out 1 2 128 1000000 2.0"
+./run.out 1 2 128 1000000 2.0
+
+echo "./run.out 1 4 8 1000000 2.0"
+./run.out 1 4 8 1000000 2.0
+
+echo "./run.out 1 4 16 1000000 2.0"
+./run.out 1 4 16 1000000 2.0
+
+echo "./run.out 1 4 32 1000000 2.0"
+./run.out 1 4 32 1000000 2.0
+
+echo "./run.out 1 4 64 1000000 2.0"
+./run.out 1 4 64 1000000 2.0
+
+echo "./run.out 1 4 128 1000000 2.0"
+./run.out 1 4 128 1000000 2.0
+
+echo "./run.out 1 8 8 1000000 2.0"
+./run.out 1 8 8 1000000 2.0
+
+echo "./run.out 1 8 16 1000000 2.0"
+./run.out 1 8 16 1000000 2.0
+
+echo "./run.out 1 8 32 1000000 2.0"
+./run.out 1 8 32 1000000 2.0
+
+echo "./run.out 1 8 64 1000000 2.0"
+./run.out 1 8 64 1000000 2.0
+
+echo "./run.out 1 8 128 1000000 2.0"
+run.out 1 8 128 1000000 2.0
+
+echo "./run.out 1 16 8 1000000 2.0"
+./run.out 1 16 8 1000000 2.0
+
+echo "./run.out 1 16 16 1000000 2.0"
+./run.out 1 16 16 1000000 2.0
+
+echo "./run.out 1 16 32 1000000 2.0"
+./run.out 1 16 32 1000000 2.0
+
+echo "./run.out 1 16 64 1000000 2.0"
+./run.out 1 16 64 1000000 2.0
+
+echo "./run.out 1 16 128 1000000 2.0"
+./run.out 1 16 128 1000000 2.0
+

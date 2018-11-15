@@ -172,7 +172,7 @@ namespace nbody {
 		auto start = std::chrono::system_clock::now();
 		snbody(sParticles);
 		auto end = std::chrono::system_clock::now();
-		time = start - end;
+		time = end - start;
 		outfile << "SMAP: " << std::to_string(time.count()) << std::endl;
 
 		// test dynamic map
@@ -180,7 +180,7 @@ namespace nbody {
 		start = std::chrono::system_clock::now();
 		dnbody(sParticles);
 		end = std::chrono::system_clock::now();
-		time = start - end;
+		time = end-start;
 		outfile << "DMAP: " << std::to_string(time.count()) << std::endl;
 
 	}
