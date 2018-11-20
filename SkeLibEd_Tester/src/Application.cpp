@@ -6,6 +6,7 @@
 #include "TestCollatz.hpp"
 #include "TestMandelbrot.hpp"
 #include "TestNBody.hpp"
+#include "mandelbrot.hpp"
 
 int main(int argc, char* argv[]){
 
@@ -24,7 +25,7 @@ int main(int argc, char* argv[]){
 	if (func != 1) {
 		iters = strtol(argv[index++], nullptr, 0);
 	}
-	if (func != 3) {
+	if (func != 3 ) {
 		arg = strtod(argv[index++], nullptr);
 	}
 
@@ -43,6 +44,9 @@ int main(int argc, char* argv[]){
 	}
 	else if (func == 3) {
 		nbody::test(thrc, blkc, ic, iters);
+	}
+	else if (func == 4) {
+		draw(thrc, blkc, ic, ic, iters, arg);
 	}
 
 return 0;

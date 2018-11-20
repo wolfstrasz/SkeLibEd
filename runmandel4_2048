@@ -1,8 +1,8 @@
 #!/bin/bash
 echo "TESTING MANDELBROT"
 
-echo "2048^2 items in 4 cores"
-echo "./run.out 2 8 128 2048 1000 2.0"
-./run.out 2 8 16 512 10000 3.0
+
+echo "./run.out 32 8 16 1024 1000 3.0"
+./run.out 4 64 100 1024 100 2.0
 
 
