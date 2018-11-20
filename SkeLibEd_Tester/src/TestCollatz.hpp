@@ -27,7 +27,8 @@ namespace collatz {
 
 	void test(size_t threadcount, size_t blockcount, size_t itemcount, double arg) {
 		// output file
-		std::string outfileName = "colatz_" + std::to_string(threadcount) + "T_"
+		std::string folderName = "collatz2_" + std::to_string(std::thread::hardware_concurrency()) + "/";
+		std::string outfileName = folderName + "collatz_" + std::to_string(threadcount) + "T_"
 			+ std::to_string(blockcount) + "B_" + std::to_string(itemcount) + "I";
 		std::ofstream outfile;
 		outfile.open(outfileName);
