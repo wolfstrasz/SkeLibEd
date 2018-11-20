@@ -3,7 +3,8 @@
 #define _TEST_MANDELBROT_HPP
 
 #include "Map.hpp"
-#include "DynamicMap.hpp"
+//#include "DynamicMap.hpp"
+#include "DynamicMap2.hpp"
 #include <chrono>
 #include <iostream>
 #include <fstream>
@@ -56,7 +57,8 @@ namespace mandelbrot {
 	void test(size_t threadcount, size_t blockcount, size_t ixc, size_t iyc,size_t itermax, double arg) {
 		int itemcount = ixc * iyc;
 		// output file
-		std::string outfileName = "mandel_" + std::to_string(threadcount) + "T_"
+		std::string folderName = "mandel2_" + std::to_string(std::thread::hardware_concurrency()) + "/";
+		std::string outfileName = folderName + "mandel_" + std::to_string(threadcount) + "T_"
 			+ std::to_string(blockcount) + "B_" + std::to_string(ixc) + "D_"
 			+ std::to_string(itermax) + "IT_" + std::to_string((int)arg) + "MAG";
 		std::ofstream outfile;
