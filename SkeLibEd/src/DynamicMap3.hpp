@@ -137,7 +137,7 @@ public:
 			sizeOfWork = input.size() / (nthreads * 16);
 			std::thread *THREADS[nthreads];
 			Scoreboard<IN, OUT> *scoreboard = new Scoreboard<IN, OUT>();
-			scoreboard->addWork(&in, &out);
+			scoreboard->addWork(&input, &output);
 			scoreboard->itemsCount = sizeOfWork;
 
 			// Run threads
@@ -148,16 +148,20 @@ public:
 			
 		//		isInitialised = true;
 	//		}
+				// Join threads
+			// ------------
+			for (size_t t = 0; t < nthreads; ++t) { THREADS[t]->join(); delete THREADS[t]; }
 
+			delete scoreboard;
 
 		}
 
 		bool stop() {
 			// Join threads
 			// ------------
-			for (size_t t = 0; t < nthreads; ++t) { THREADS[t]->join(); delete THREADS[t]; }
+//			for (size_t t = 0; t < nthreads; ++t) { THREADS[t]->join(); delete THREADS[t]; }
 
-			delete scoreboard;
+		//	delete scoreboard;
 		}
 
 		// Utility functions for setting options
