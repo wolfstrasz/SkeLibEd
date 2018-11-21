@@ -149,7 +149,7 @@ public:
 
 			//	if (!isInitialised) {
 
-			init(output,input, args);
+			init(output,input, args...);
 			////////////////////////////////////////////////////////////////////
 
 		/*	std::thread *tt;
