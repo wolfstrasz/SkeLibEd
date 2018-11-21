@@ -43,7 +43,7 @@ public:
 		std::chrono::high_resolution_clock::time_point tstart;
 		std::chrono::high_resolution_clock::time_point tend;
 
-		template<typename IN, typename OUT>
+		template<typename IN, typename OUT, typename ...ARGs>
 		class Scoreboard {
 		public:
 			// constructor
