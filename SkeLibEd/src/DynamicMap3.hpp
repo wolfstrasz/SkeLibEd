@@ -128,10 +128,19 @@ public:
 			allThreads = (std::thread**)malloc(nthreads * sizeof(std::thread *));
 	//		this->isInitialised = false;
 		}
-		/*template <typename IN, typename OUT, typename ...ARGS>
+		template <typename IN, typename OUT, typename ...ARGS>
 		void init() {
+			sizeOfWork = input.size() / (nthreads * 16);
+			//std::thread *THREADS[nthreads];
+			//Scoreboard<IN, OUT> *scoreboard = new Scoreboard<IN, OUT>();
+			scoreboard = new Scoreboard<IN, OUT>();
+			((Scoreboard<IN, OUT>*)scoreboard)->addWork(&input, &output);
+			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 
-		}*/
+			for (size_t t = 0; t < nthreads; t++) {
+				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, ((Scoreboard<IN, OUT>*)scoreboard), args...);
+			}
+		}
 	public:
 		// Paranthesis operator: call function
 		// -----------------------------------
@@ -140,6 +149,7 @@ public:
 
 			//	if (!isInitialised) {
 
+			init();
 			////////////////////////////////////////////////////////////////////
 
 		/*	std::thread *tt;
@@ -160,24 +170,24 @@ public:
 			delete tt;*/
 
 			////////////////////////////////////////////////////////////////////
-			sizeOfWork = input.size() / (nthreads * 16);
-			//std::thread *THREADS[nthreads];
-			//Scoreboard<IN, OUT> *scoreboard = new Scoreboard<IN, OUT>();
-			scoreboard = new Scoreboard<IN, OUT>();
-			((Scoreboard<IN, OUT>*)scoreboard)->addWork(&input, &output);
-			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
+			//sizeOfWork = input.size() / (nthreads * 16);
+			////std::thread *THREADS[nthreads];
+			////Scoreboard<IN, OUT> *scoreboard = new Scoreboard<IN, OUT>();
+			//scoreboard = new Scoreboard<IN, OUT>();
+			//((Scoreboard<IN, OUT>*)scoreboard)->addWork(&input, &output);
+			//((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 
 			// Run threads
 			// -----------
 			//std::cout << "RUNNING THREADS" << std::endl;
-			for (size_t t = 0; t < nthreads; t++) {
+		//	for (size_t t = 0; t < nthreads; t++) {
 		//		tstart = std::chrono::high_resolution_clock::now();
-				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, ((Scoreboard<IN, OUT>*)scoreboard), args...);
+		//		allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, ((Scoreboard<IN, OUT>*)scoreboard), args...);
 		//		tend = std::chrono::high_resolution_clock::now();
 		//		auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 		//		std::cout << "THREAD: " << t << "\n";
 		//		std::cout << duration << "\n";
-			}
+		//	}
 			//		isInitialised = true;
 		//		}
 					// Join threads
