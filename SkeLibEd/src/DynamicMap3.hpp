@@ -185,7 +185,7 @@ public:
 			//for (size_t t = 0; t < nthreads; ++t) { THREADS[t]->join(); delete THREADS[t]; }
 			for (size_t t = 0; t < nthreads; ++t) { allThreads[t]->join(); delete allThreads[t]; }
 			delete allThreads;
-			delete scoreboard;
+			delete ((Scoreboard<IN, OUT>*)scoreboard);
 
 		}
 
