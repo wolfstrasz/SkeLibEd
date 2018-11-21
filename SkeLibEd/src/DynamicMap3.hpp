@@ -138,18 +138,18 @@ public:
 			////////////////////////////////////////////////////////////////////
 
 			std::thread *tt;
-			tstart = high_resolution_clock::now();
+			tstart = std::chrono::high_resolution_clock::now();
 			tt = new std::thread(&DynamicMapImplementation<EL>::stop, this);
-			tend = high_resolution_clock::now();
-			auto duration = duration_cast<microseconds>(tend - tstart).count();
+			tend = std::chrono::high_resolution_clock::now();
+			auto duration = std::chrono::duration_cast<microseconds>(tend - tstart).count();
 			std::cout << "FF THREAD start:\n";
 			std::cout << duration << "\n";
 
 
-			tstart = high_resolution_clock::now();
+			tstart = std::chrono::high_resolution_clock::now();
 			tt->join();
-			tend = high_resolution_clock::now();
-			duration = duration_cast<microseconds>(tend - tstart).count();
+			tend = std::chrono::high_resolution_clock::now();
+			duration = std::chrono::duration_cast<microseconds>(tend - tstart).count();
 			std::cout << "FF THREAD join:\n";
 			std::cout << duration << "\n";
 			delete tt;
@@ -165,10 +165,10 @@ public:
 			// -----------
 			//std::cout << "RUNNING THREADS" << std::endl;
 			for (size_t t = 0; t < nthreads; t++) {
-				tstart = high_resolution_clock::now();
+				tstart = std::chrono::high_resolution_clock::now();
 				THREADS[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, scoreboard, t, args...);
-				tend = high_resolution_clock::now();
-				auto duration = duration_cast<microseconds>(tend - tstart).count();
+				tend = std::chrono::high_resolution_clock::now();
+				auto duration = std::chrono::duration_cast<microseconds>(tend - tstart).count();
 				std::cout << "THREAD: " << t << "\n";
 				std::cout << duration << "\n";
 			}
