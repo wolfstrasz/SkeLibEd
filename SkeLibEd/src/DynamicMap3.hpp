@@ -164,7 +164,7 @@ public:
 			//std::thread *THREADS[nthreads];
 			//Scoreboard<IN, OUT> *scoreboard = new Scoreboard<IN, OUT>();
 			scoreboard = new Scoreboard<IN, OUT>();
-			scoreboard->addWork(&input, &output);
+			((Scoreboard<IN,OUT>*)scoreboard)->addWork(&input, &output);
 			scoreboard->itemsCount = sizeOfWork;
 
 			// Run threads
