@@ -158,7 +158,7 @@ public:
 
 			std::thread *tt;
 			tstart = std::chrono::high_resolution_clock::now();
-			tt = new std::thread(&DynamicMapImplementation<EL>::init, this, output, input, args...);
+			tt = new std::thread(&DynamicMapImplementation<EL>::init, output, input, args...);
 			tend = std::chrono::high_resolution_clock::now();
 			auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 			std::cout << "FF THREAD start:\n";
