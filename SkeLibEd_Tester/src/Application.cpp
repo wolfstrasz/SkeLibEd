@@ -48,6 +48,9 @@ int main(int argc, char* argv[]){
 	else if (func == 4) {
 		draw(thrc, blkc, ic, ic, iters, arg);
 	}
+	else {
+
+	}
 
 return 0;
 }
