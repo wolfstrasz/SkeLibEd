@@ -78,9 +78,10 @@ public:
 
 		};
 		void* scoreboard;
+
+
 		// ThreadMap - function applied to each thread
 		// --------------------------------------------
-		//	THREADS[t] = new std::thread(&MapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, threadArguments, t, args...);
 		template<typename IN, typename OUT, typename ...ARGs>
 		void threadMap(Scoreboard<IN, OUT> *scoreboard, ARGs... args) {
 
@@ -142,6 +143,8 @@ public:
 				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, ((Scoreboard<IN, OUT>*)scoreboard), args...);
 			}
 		}
+
+
 	public:
 		// Paranthesis operator: call function
 		// -----------------------------------
@@ -150,12 +153,12 @@ public:
 
 			//	if (!isInitialised) {
 
-			init(output,input, args...);
+			//init(output,input, args...);
 			////////////////////////////////////////////////////////////////////
 
-		/*	std::thread *tt;
+			std::thread *tt;
 			tstart = std::chrono::high_resolution_clock::now();
-			tt = new std::thread(&DynamicMapImplementation<EL>::stop, this);
+			tt = new std::thread(&DynamicMapImplementation<EL>::init, this, output, input, args...);
 			tend = std::chrono::high_resolution_clock::now();
 			auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 			std::cout << "FF THREAD start:\n";
@@ -168,7 +171,7 @@ public:
 			duration = std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 			std::cout << "FF THREAD join:\n";
 			std::cout << duration << "\n";
-			delete tt;*/
+			delete tt;
 
 			////////////////////////////////////////////////////////////////////
 			//sizeOfWork = input.size() / (nthreads * 16);
