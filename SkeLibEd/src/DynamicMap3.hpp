@@ -43,7 +43,6 @@ public:
 		std::chrono::high_resolution_clock::time_point tstart;
 		std::chrono::high_resolution_clock::time_point tend;
 
-
 		template<typename IN, typename OUT>
 		class Scoreboard {
 		public:
@@ -78,7 +77,7 @@ public:
 			std::mutex scoreboardInUse;
 
 		};
-
+		void* scoreboard;
 		// ThreadMap - function applied to each thread
 		// --------------------------------------------
 		//	THREADS[t] = new std::thread(&MapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, threadArguments, t, args...);
@@ -163,7 +162,8 @@ public:
 			////////////////////////////////////////////////////////////////////
 			sizeOfWork = input.size() / (nthreads * 16);
 			//std::thread *THREADS[nthreads];
-			Scoreboard<IN, OUT> *scoreboard = new Scoreboard<IN, OUT>();
+			//Scoreboard<IN, OUT> *scoreboard = new Scoreboard<IN, OUT>();
+			scoreboard = new Scoreboard<IN, OUT>();
 			scoreboard->addWork(&input, &output);
 			scoreboard->itemsCount = sizeOfWork;
 
@@ -171,12 +171,12 @@ public:
 			// -----------
 			//std::cout << "RUNNING THREADS" << std::endl;
 			for (size_t t = 0; t < nthreads; t++) {
-				tstart = std::chrono::high_resolution_clock::now();
+		//		tstart = std::chrono::high_resolution_clock::now();
 				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, scoreboard, args...);
-				tend = std::chrono::high_resolution_clock::now();
-				auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
-				std::cout << "THREAD: " << t << "\n";
-				std::cout << duration << "\n";
+		//		tend = std::chrono::high_resolution_clock::now();
+		//		auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
+		//		std::cout << "THREAD: " << t << "\n";
+		//		std::cout << duration << "\n";
 			}
 			//		isInitialised = true;
 		//		}
