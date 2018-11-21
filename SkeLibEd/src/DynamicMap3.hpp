@@ -12,7 +12,7 @@
 #include <utility>
 #include <thread>
 #include <mutex>
-
+#include <chrono>
 class DynamicMapSkeleton {
 
 private:
@@ -40,7 +40,8 @@ public:
 		size_t sizeOfWork;
 	//	bool isInitialised;
 		Elemental<EL> elemental;
-
+		std::chrono::high_resolution_clock::time_point tstart;
+		std::chrono::high_resolution_clock::time_point tend;
 		template<typename IN, typename OUT>
 		class Scoreboard {
 		public:
@@ -132,8 +133,28 @@ public:
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 
-		//	if (!isInitialised) {
+			//	if (!isInitialised) {
 
+			////////////////////////////////////////////////////////////////////
+
+			std::thread *tt;
+			tstart = high_resolution_clock::now();
+			tt = new std::thread(&DynamicMapImplementation<EL>::stop, this);
+			tend = high_resolution_clock::now();
+			auto duration = duration_cast<microseconds>(tend - tstart).count();
+			std::cout << "FF THREAD start:\n";
+			std::cout << duration << "\n";
+
+
+			tstart = high_resolution_clock::now();
+			tt->join();
+			tend = high_resolution_clock::now();
+			duration = duration_cast<microseconds>(tend - tstart).count();
+			std::cout << "FF THREAD join:\n";
+			std::cout << duration << "\n";
+			delete tt;
+
+			////////////////////////////////////////////////////////////////////
 			sizeOfWork = input.size() / (nthreads * 16);
 			std::thread *THREADS[nthreads];
 			Scoreboard<IN, OUT> *scoreboard = new Scoreboard<IN, OUT>();
@@ -143,13 +164,18 @@ public:
 			// Run threads
 			// -----------
 			//std::cout << "RUNNING THREADS" << std::endl;
-			for (size_t t = 0; t < nthreads; t++)
+			for (size_t t = 0; t < nthreads; t++) {
+				tstart = high_resolution_clock::now();
 				THREADS[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, scoreboard, t, args...);
-			
-		//		isInitialised = true;
-	//		}
-				// Join threads
-			// ------------
+				tend = high_resolution_clock::now();
+				auto duration = duration_cast<microseconds>(tend - tstart).count();
+				std::cout << "THREAD: " << t << "\n";
+				std::cout << duration << "\n";
+			}
+			//		isInitialised = true;
+		//		}
+					// Join threads
+				// ------------
 			for (size_t t = 0; t < nthreads; ++t) { THREADS[t]->join(); delete THREADS[t]; }
 
 			delete scoreboard;
@@ -163,6 +189,7 @@ public:
 
 		//	delete scoreboard;
 		}
+
 
 		// Utility functions for setting options
 		// ------------------------------------
