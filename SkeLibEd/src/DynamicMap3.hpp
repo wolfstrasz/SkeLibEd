@@ -164,15 +164,15 @@ public:
 			//std::thread *THREADS[nthreads];
 			//Scoreboard<IN, OUT> *scoreboard = new Scoreboard<IN, OUT>();
 			scoreboard = new Scoreboard<IN, OUT>();
-			((Scoreboard<IN,OUT>*)scoreboard)->addWork(&input, &output);
-			scoreboard->itemsCount = sizeOfWork;
+			((Scoreboard<IN, OUT>*)scoreboard)->addWork(&input, &output);
+			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 
 			// Run threads
 			// -----------
 			//std::cout << "RUNNING THREADS" << std::endl;
 			for (size_t t = 0; t < nthreads; t++) {
 		//		tstart = std::chrono::high_resolution_clock::now();
-				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, scoreboard, args...);
+				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, ((Scoreboard<IN, OUT>*)scoreboard), args...);
 		//		tend = std::chrono::high_resolution_clock::now();
 		//		auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 		//		std::cout << "THREAD: " << t << "\n";
