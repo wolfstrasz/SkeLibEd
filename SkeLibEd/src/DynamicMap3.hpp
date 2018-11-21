@@ -129,12 +129,12 @@ public:
 	//		this->isInitialised = false;
 		}
 		template <typename IN, typename OUT, typename ...ARGS>
-		void init() {
+		void init(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 			sizeOfWork = input.size() / (nthreads * 16);
 			//std::thread *THREADS[nthreads];
 			//Scoreboard<IN, OUT> *scoreboard = new Scoreboard<IN, OUT>();
 			scoreboard = new Scoreboard<IN, OUT>();
-			((Scoreboard<IN, OUT>*)scoreboard)->addWork(&input, &output);
+			((Scoreboard<IN, OUT>*)scoreboard)->addWork(input, output);
 			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 
 			for (size_t t = 0; t < nthreads; t++) {
@@ -149,7 +149,7 @@ public:
 
 			//	if (!isInitialised) {
 
-			init();
+			init(output,input, args);
 			////////////////////////////////////////////////////////////////////
 
 		/*	std::thread *tt;
