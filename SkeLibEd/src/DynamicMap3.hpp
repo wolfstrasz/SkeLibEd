@@ -43,7 +43,7 @@ public:
 		std::chrono::high_resolution_clock::time_point tstart;
 		std::chrono::high_resolution_clock::time_point tend;
 
-		template<typename IN, typename OUT, typename ...ARGs>
+		template<typename IN, typename OUT>
 		class Scoreboard {
 		public:
 			// constructor
@@ -128,7 +128,8 @@ public:
 			allThreads = (std::thread**)malloc(nthreads * sizeof(std::thread *));
 	//		this->isInitialised = false;
 		}
-		template <typename IN, typename OUT, typename ...ARGS>
+
+		template <typename IN, typename OUT, typename ...ARGs>
 		void init(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 			sizeOfWork = input.size() / (nthreads * 16);
 			//std::thread *THREADS[nthreads];
