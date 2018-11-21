@@ -126,7 +126,7 @@ public:
 		DynamicMapImplementation(Elemental<EL> elemental) : elemental(elemental) {
 			this->nthreads = std::thread::hardware_concurrency();
 			this->sizeOfWork = 1000;
-			allThreads = malloc(nthreads * sizeof(std::thread *));
+			allThreads = (std::thread**)malloc(nthreads * sizeof(std::thread *));
 	//		this->isInitialised = false;
 		}
 		/*template <typename IN, typename OUT, typename ...ARGS>
