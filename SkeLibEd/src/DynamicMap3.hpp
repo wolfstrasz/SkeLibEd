@@ -135,7 +135,7 @@ public:
 			//std::thread *THREADS[nthreads];
 			//Scoreboard<IN, OUT> *scoreboard = new Scoreboard<IN, OUT>();
 			scoreboard = new Scoreboard<IN, OUT>();
-			((Scoreboard<IN, OUT>*)scoreboard)->addWork(input, output);
+			((Scoreboard<IN, OUT>*)scoreboard)->addWork(&input, &output);
 			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 
 			for (size_t t = 0; t < nthreads; t++) {
