@@ -52,10 +52,7 @@ public:
 				this->isFinished = false;
 				this->curIndex = 0;
 			}
-			~Scoreboard() {
-				delete output;
-				delete input;
-			}
+			~Scoreboard() {}
 			void addWork(std::vector<IN> *in, std::vector<OUT> *out) {
 				this->input = in;
 				this->output = out;
@@ -212,7 +209,7 @@ public:
 			// ------------
 
 			for (size_t t = 0; t < nthreads; ++t) { allThreads[t]->join(); delete allThreads[t]; }
-			delete allThreads;
+			free(allThreads);
 			delete ((Scoreboard<IN, OUT>*)scoreboard);
 
 		}
