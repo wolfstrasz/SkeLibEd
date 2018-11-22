@@ -138,6 +138,8 @@ public:
 		template <typename IN, typename OUT, typename ...ARGs>
 		void init(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 			sizeOfWork = input.size() / (nthreads * 16);
+			std::cout << input[10] << std::endl;;
+
 			scoreboard = new Scoreboard<IN, OUT>();
 			((Scoreboard<IN, OUT>*)scoreboard)->addWork(&input, &output);
 			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
@@ -151,18 +153,19 @@ public:
 		// -----------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
-
+			std::cout << input[10] << std::endl;;
+			init(output, input, args...);
 		//	if (!isInitialised) {
 
 				//init(output, input, args...);
 				////////////////////////////////////////////////////////////////////
 				//tt = new std::thread(&DynamicMapImplementation<EL>::init,this, output, input, args...);
 				
-				std::thread *tt;
+		/*		std::thread *tt;
 				tstart = std::chrono::high_resolution_clock::now();
 				tt = new std::thread(&DynamicMapImplementation<EL>::stop, this);
 				tend = std::chrono::high_resolution_clock::now();
-				duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
+				duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();*/
 		////		std::cout << "FF THREAD start:\n";
 		////		std::cout << duration << "\n";
 		//		tt->join();
@@ -178,7 +181,8 @@ public:
 				}
 				std::cout <<" NEW WORK SIZE: "<< newWorkSize << std::endl;
 				sizeOfWork = newWorkSize;*/
-				init(output, input, args...);
+				/*std::cout << input[10] <<std::endl;;
+				init(output, input, args...);*/
 			//	isInitialised = true;
 		//	}
 
