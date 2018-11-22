@@ -127,8 +127,9 @@ public:
 		// -----------
 		DynamicMapImplementation(Elemental<EL> elemental) : elemental(elemental) {
 			this->nthreads = std::thread::hardware_concurrency();
-			this->sizeOfWork = 1000;
-			allThreads = new std::thread*[nthreads];
+			this->sizeOfWork = 0;
+			this->duration = 0.0f;
+			this->allThreads = new std::thread*[nthreads];
 			this->isInitialised = false;
 		}
 
@@ -136,10 +137,7 @@ public:
 		template <typename IN, typename OUT, typename ...ARGs>
 		void init(std::vector<OUT> *output, std::vector<IN> *input, ARGs... args) {
 			// init scoreboard
-			scoreboard = new Scoreboard<IN, OUT>();
 			((Scoreboard<IN, OUT>*)scoreboard)->addWork(input, output);
-			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
-			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
 			// create threads
 			for (size_t t = 0; t < nthreads; t++) {
 				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, ((Scoreboard<IN, OUT>*)scoreboard), args...);
@@ -173,9 +171,8 @@ public:
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 			if (!isInitialised) {
-				sizeOfWork = 0;
-				duration = 0.0f;
-				
+				scoreboard = new Scoreboard<IN, OUT>();
+
 				// USE THREADER
 				// -----------------------------------------------------------------------------
 				// start threader
@@ -184,10 +181,10 @@ public:
 				threader = new std::thread(&DynamicMapImplementation<EL>::init<IN, OUT, ARGs...>, this, &output, &input, args...);
 				tend = std::chrono::high_resolution_clock::now();
 				duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
+
 				// main thread analyses
 				analyse(&output, &input, args...);
 				
-
 				// delete threader
 				threader->join();
 				delete threader;
@@ -217,10 +214,6 @@ public:
 			for (size_t t = 0; t < nthreads; ++t) { allThreads[t]->join(); delete allThreads[t]; }
 			delete allThreads;
 			delete ((Scoreboard<IN, OUT>*)scoreboard);
-		
-		}
-
-		void stop() {
 		
 		}
 
