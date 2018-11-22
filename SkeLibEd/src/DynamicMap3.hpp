@@ -159,7 +159,7 @@ public:
 		}
 
 		template <typename IN, typename OUT, typename ...ARGs>
-		void analyse(std::vector<OUT> &output, std::vector<IN> input, ARGs... args) {
+		void analyse(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 
 			size_t newWorkSize = 0;
 			while (duration != 0.0f);
