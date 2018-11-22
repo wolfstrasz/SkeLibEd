@@ -185,7 +185,7 @@ public:
 			if (!isInitialised) {
 				std::cout << "STARTING INITIALISATION\n";
 				//sizeOfWork = input.size() / (nthreads * 16);
-				duration = 20000.0f;
+				duration = 0.0f;
 
 				std::thread *analyser;
 				tstart = std::chrono::high_resolution_clock::now();
