@@ -178,7 +178,7 @@ public:
 				}
 				std::cout <<" NEW WORK SIZE: "<< newWorkSize << std::endl;
 				sizeOfWork = newWorkSize;*/
-				init(output, input, args...);
+				init(&output, &input, args...);
 			//	isInitialised = true;
 		//	}
 
