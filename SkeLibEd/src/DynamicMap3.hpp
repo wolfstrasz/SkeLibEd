@@ -157,11 +157,11 @@ public:
 			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
 			// ITEM COUNT = 0
-			std::cout << "STARTING INIT\n";
+		//	std::cout << "STARTING INIT\n";
 			for (size_t t = 0; t < nthreads; t++) {
 				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, ((Scoreboard<IN, OUT>*)scoreboard), args...);
 			}
-			std::cout << "STARTING INIT\n";
+		//	std::cout << "STARTING INIT\n";
 		}
 
 		template <typename IN, typename OUT, typename ...ARGs>
@@ -188,7 +188,7 @@ public:
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 			std::thread *threader;
-			std::cout << isInitialised << "\n";
+		//	std::cout << isInitialised << "\n";
 			if (!isInitialised) {
 				std::cout << "STARTING INITIALISATION\n";
 				//sizeOfWork = input.size() / (nthreads * 16);
@@ -197,12 +197,12 @@ public:
 				
 
 			
-				std::cout << "STARTING INITIALISATION\n";
+			//	std::cout << "STARTING INITIALISATION\n";
 				tstart = std::chrono::high_resolution_clock::now();
 				threader = new std::thread(&DynamicMapImplementation<EL>::init<IN, OUT, ARGs...>, this, &output, &input, args...);
 				tend = std::chrono::high_resolution_clock::now();
 				duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
-				std::cout << "STARTING INITIALISATION\n";
+			//	std::cout << "STARTING INITIALISATION\n";
 				analyse(&output, &input, args...);
 				std::cout << sizeOfWork << std::endl;
 				((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
@@ -229,15 +229,15 @@ public:
 
 			// Join threads
 			// ------------
-			std::cout << "STARTING INITIALISATION\n";
-			for (size_t t = 0; t < nthreads; ++t) { allThreads[t]->join(); delete allThreads[t]; std::cout << "DELETED TREAD\n";
+			//std::cout << "STARTING INITIALISATION\n";
+			for (size_t t = 0; t < nthreads; ++t) { allThreads[t]->join(); delete allThreads[t];// std::cout << "DELETED TREAD\n";
 			}
 			delete allThreads;
 			delete ((Scoreboard<IN, OUT>*)scoreboard);
 			isInitialised = false;
 			threader->join();
 			delete threader;
-			std::cout << "STARTING INITIALISATION\n";
+		//	std::cout << "STARTING INITIALISATION\n";
 		}
 
 		void stop() {
