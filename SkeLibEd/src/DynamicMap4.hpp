@@ -140,7 +140,6 @@ public:
 		template <typename IN, typename OUT, typename ...ARGs>
 		void init(std::vector<OUT> *output, std::vector<IN> *input, ARGs... args) {
 			// init scoreboard
-			scoreboard = new Scoreboard<IN, OUT>();
 			((Scoreboard<IN, OUT>*)scoreboard)->addWork(input, output);
 			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
@@ -169,6 +168,7 @@ public:
 			sizeOfWork = newWorkSize;
 
 			// send work size
+
 			((Scoreboard<IN, OUT>*)scoreboard)->meanTime /= sizeOfWork;
 			std::cout << "Mean Time: " << ((Scoreboard<IN, OUT>*)scoreboard)->meanTime << "\n";
 			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
@@ -181,6 +181,7 @@ public:
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 			if (!isInitialised) {
+				scoreboard = new Scoreboard<IN, OUT>();
 				sizeOfWork = 0;
 				duration = 0.0f;
 
