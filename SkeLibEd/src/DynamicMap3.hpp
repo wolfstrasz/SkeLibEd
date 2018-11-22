@@ -180,7 +180,7 @@ public:
 		////		std::cout << duration << "\n";
 		//		tt->join();
 		//		delete tt;
-
+				std::cout << "DURATION : " << duration<< std::endl;
 				size_t newWorkSize = 0;
 				while (duration > 0.0f) {
 					tstart = std::chrono::high_resolution_clock::now();
