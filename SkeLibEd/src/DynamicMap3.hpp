@@ -203,6 +203,7 @@ public:
 				tend = std::chrono::high_resolution_clock::now();
 				std::cout << "STARTING INITIALISATION\n";
 				analyse(&output, &input, args...);
+				std::cout << sizeOfWork << endl;
 				((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
 				((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 			/*	threader->join();
