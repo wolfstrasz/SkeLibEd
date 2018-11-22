@@ -129,7 +129,6 @@ public:
 
 			// init scoreboard
 			while (!((Scoreboard<IN, OUT>*)scoreboard)->scoreboardInUse.try_lock());
-			((Scoreboard<IN, OUT>*)scoreboard)->addWork(input, output);
 			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
 			((Scoreboard<IN, OUT>*)scoreboard)->scoreboardInUse.unlock();
@@ -170,7 +169,7 @@ public:
 		// -----------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
-			scoreboard = new Scoreboard<IN, OUT>();
+			scoreboard = new Scoreboard<IN, OUT>(&input, &output);
 
 			// USE THREADER
 			// -----------------------------------------------------------------------------------
