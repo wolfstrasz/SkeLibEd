@@ -187,16 +187,16 @@ public:
 				//sizeOfWork = input.size() / (nthreads * 16);
 				duration = 20000.0f;
 
-		//		std::thread *analyser;
+				std::thread *analyser;
 				tstart = std::chrono::high_resolution_clock::now();
-		//		analyser = new std::thread(&DynamicMapImplementation<EL>::analyse<IN,OUT,ARGs...>, this, &output, &input, args...);
-				analyse(&output, &input, args...);
+				analyser = new std::thread(&DynamicMapImplementation<EL>::analyse<IN,OUT,ARGs...>, this, &output, &input, args...);
+	//			analyse(&output, &input, args...);
 				tend = std::chrono::high_resolution_clock::now();
-			//	duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
+				duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 
 				init(output, input, args...);
 
-			//	analyser->join();
+				analyser->join();
 				((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
 				((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 				//delete analyser;
