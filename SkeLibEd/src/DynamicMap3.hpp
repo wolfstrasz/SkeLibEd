@@ -175,7 +175,7 @@ public:
 				while (duration > 0.0f) {
 					tstart = std::chrono::high_resolution_clock::now();
 					((Scoreboard<IN, OUT>*)scoreboard)->output->at(elementIndex + elementsFinished) = 
-						elemental.elemental(((Scoreboard<IN, OUT>*)scoreboard)->input->at(elementIndex + elementsFinished), args...);
+						elemental.elemental(((Scoreboard<IN, OUT>*)scoreboard)->input->at(newWorkSize), args...);
 					tend = std::chrono::high_resolution_clock::now();
 					duration -= (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 					newWorkSize++;
