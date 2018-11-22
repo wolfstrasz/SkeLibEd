@@ -117,16 +117,16 @@ public:
 				// ----------------------
 				for (int elementsFinished = 0; elementsFinished < elementsCount; elementsFinished++) {
 
-					if (elementIndex + elementsFinished == 10) {
+	/*				if (elementIndex + elementsFinished == 10) {
 						std::cout << " THREDI\n";
 
 						std::cout << scoreboard->output->at(10);
-					}
+					}*/
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
-					if (elementIndex + elementsFinished == 10) {
+		/*			if (elementIndex + elementsFinished == 10) {
 						std::cout << " THREDI\n";
 						std::cout << scoreboard->output->at(10);
-					}
+					}*/
 				}
 			}
 
@@ -163,10 +163,9 @@ public:
 		// -----------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
-			std::cout << input[10] << std::endl;;
-			std::cout << output[10] << std::endl;;
-			init(output, input, args...);
-		//	if (!isInitialised) {
+		//	std::cout << input[10] << std::endl;;
+		//	std::cout << output[10] << std::endl;;
+			if (!isInitialised) {
 
 				//init(output, input, args...);
 				////////////////////////////////////////////////////////////////////
@@ -192,10 +191,12 @@ public:
 				}
 				std::cout <<" NEW WORK SIZE: "<< newWorkSize << std::endl;
 				sizeOfWork = newWorkSize;*/
+				init(output, input, args...);
+
 				/*std::cout << input[10] <<std::endl;;
 				init(output, input, args...);*/
 			//	isInitialised = true;
-		//	}
+			}
 
 			// Join threads
 			// ------------
@@ -203,7 +204,7 @@ public:
 			for (size_t t = 0; t < nthreads; ++t) { allThreads[t]->join(); delete allThreads[t]; }
 			delete allThreads;
 			delete ((Scoreboard<IN, OUT>*)scoreboard);
-			std::cout << output[10] << std::endl;;
+			//std::cout << output[10] << std::endl;;
 			//stop();
 		}
 
