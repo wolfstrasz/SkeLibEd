@@ -159,7 +159,7 @@ public:
 		}
 
 		template <typename IN, typename OUT, typename ...ARGs>
-		void analyse(std::vector<OUT> &output /*, std::vector<IN> &input, ARGs... args*/) {
+		void analyse(std::vector<OUT> *output /*, std::vector<IN> &input, ARGs... args*/) {
 
 			/*size_t newWorkSize = 0;
 			while (duration != 0.0f);
@@ -177,7 +177,7 @@ public:
 		// Paranthesis operator: call function
 		// -----------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
-		void operator()(std::vector<OUT> *output, std::vector<IN> &input, ARGs... args) {
+		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 			if (!isInitialised) {
 				//sizeOfWork = input.size() / (nthreads * 16);
 				duration = 0.0f;
