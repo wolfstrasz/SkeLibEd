@@ -161,11 +161,11 @@ public:
 				////////////////////////////////////////////////////////////////////
 				//tt = new std::thread(&DynamicMapImplementation<EL>::init,this, output, input, args...);
 
-		//		std::thread *tt;
-		//		tstart = std::chrono::high_resolution_clock::now();
-		//		//tt = new std::thread(&DynamicMapImplementation<EL>::stop, this);
-		//		tend = std::chrono::high_resolution_clock::now();
-		//		duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
+				std::thread *tt;
+				tstart = std::chrono::high_resolution_clock::now();
+				tt = new std::thread(&DynamicMapImplementation<EL>::stop, this);
+				tend = std::chrono::high_resolution_clock::now();
+				duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 		////		std::cout << "FF THREAD start:\n";
 		////		std::cout << duration << "\n";
 		//		tt->join();
@@ -174,8 +174,7 @@ public:
 				size_t newWorkSize = 0;
 				while (duration > 0.0f) {
 					tstart = std::chrono::high_resolution_clock::now();
-					((Scoreboard<IN, OUT>*)scoreboard)->output->at(newWorkSize) =
-						elemental.elemental(((Scoreboard<IN, OUT>*)scoreboard)->input->at(newWorkSize), args...);
+					output->at(newWorkSize) = elemental.elemental(input->at(newWorkSize), args...);
 					tend = std::chrono::high_resolution_clock::now();
 					duration -= (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 					newWorkSize++;
