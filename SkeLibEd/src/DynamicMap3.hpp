@@ -161,16 +161,16 @@ public:
 		template <typename IN, typename OUT, typename ...ARGs>
 		void analyse(std::vector<OUT> *output , std::vector<IN> *input, ARGs... args) {
 
-			/*size_t newWorkSize = 0;
+			size_t newWorkSize = 0;
 			while (duration != 0.0f);
 			while (duration > 0.0f) {
 				tstart = std::chrono::high_resolution_clock::now();
-				output.at(newWorkSize) = elemental.elemental(input.at(newWorkSize), args...);
+				output->at(newWorkSize) = elemental.elemental(input->at(newWorkSize), args...);
 				tend = std::chrono::high_resolution_clock::now();
 				duration -= (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 				newWorkSize++;
 			}
-			sizeOfWork = newWorkSize;*/
+			sizeOfWork = newWorkSize;
 		}
 
 
