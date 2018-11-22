@@ -214,7 +214,7 @@ public:
 			for (size_t t = 0; t < nthreads; ++t) { allThreads[t]->join(); delete allThreads[t]; }
 			delete allThreads;
 			delete ((Scoreboard<IN, OUT>*)scoreboard);
-
+			isInitialised = false;
 		}
 
 		void stop() {
