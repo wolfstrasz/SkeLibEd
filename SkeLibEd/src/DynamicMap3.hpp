@@ -148,9 +148,9 @@ public:
 
 	public:
 		template <typename IN, typename OUT, typename ...ARGs>
-		void init(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
+		void init(std::vector<OUT> *output, std::vector<IN> *input, ARGs... args) {
 			scoreboard = new Scoreboard<IN, OUT>();
-			((Scoreboard<IN, OUT>*)scoreboard)->addWork(&input, &output);
+			((Scoreboard<IN, OUT>*)scoreboard)->addWork(input, output);
 			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
 			// ITEM COUNT = 0
@@ -192,7 +192,7 @@ public:
 
 				std::thread *threader;
 				tstart = std::chrono::high_resolution_clock::now();
-				threader = new std::thread(&DynamicMapImplementation<EL>::init<IN, OUT, ARGs...>, this, output, input, args...);
+				threader = new std::thread(&DynamicMapImplementation<EL>::init<IN, OUT, ARGs...>, this, &output, &input, args...);
 				tend = std::chrono::high_resolution_clock::now();
 				analyse(&output, &input, args...);
 				((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
