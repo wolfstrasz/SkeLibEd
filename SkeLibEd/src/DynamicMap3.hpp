@@ -154,6 +154,7 @@ public:
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 			std::cout << input[10] << std::endl;;
+			std::cout << output[10] << std::endl;;
 			init(output, input, args...);
 		//	if (!isInitialised) {
 
@@ -188,9 +189,11 @@ public:
 
 			// Join threads
 			// ------------
+
 			for (size_t t = 0; t < nthreads; ++t) { allThreads[t]->join(); delete allThreads[t]; }
 			delete allThreads;
 			delete ((Scoreboard<IN, OUT>*)scoreboard);
+			std::cout << output[10] << std::endl;;
 			//stop();
 		}
 
