@@ -52,6 +52,10 @@ public:
 				this->isFinished = false;
 				this->curIndex = 0;
 			}
+			~Scoreboard() {
+				delete output;
+				delete input;
+			}
 			void addWork(std::vector<IN> *in, std::vector<OUT> *out) {
 				this->input = in;
 				this->output = out;
