@@ -130,19 +130,19 @@ public:
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
 					wend = std::chrono::high_resolution_clock::now();
 					workTime = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(wend - wstart).count();
-
-					if (workTime > scoreTime * 1.25f && workTime < scoreTime * 2.00f) {
+					std::cout << workTime << endl;
+					if (workTime > scoreTime * 1.50f && workTime < scoreTime * 2.00f) {
 						// lessen work
-						//while (!scoreboard->scoreboardInUse.try_lock());
+						while (!scoreboard->scoreboardInUse.try_lock());
 						scoreboard->itemsCount = scoreboard->itemsCount / 2;
 						scoreboard->meanTime = workTime;
-					//	scoreboard->scoreboardInUse.unlock();
-					} else if (workTime < scoreTime * 0.75f && workTime > scoreTime * 0.50f) {
+						scoreboard->scoreboardInUse.unlock();
+					} else if (workTime * 1.50f < scoreTime && workTime * 2.00f > scoreTime ) {
 						// increase work
-						//while (!scoreboard->scoreboardInUse.try_lock());
+						while (!scoreboard->scoreboardInUse.try_lock());
 						scoreboard->itemsCount = scoreboard->itemsCount * 2;
 						scoreboard->meanTime = workTime;
-						//scoreboard->scoreboardInUse.unlock();
+						scoreboard->scoreboardInUse.unlock();
 					}
 				}
 			}
