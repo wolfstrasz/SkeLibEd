@@ -146,8 +146,8 @@ public:
 
 
 	public:
-		template <typename EL, typename IN, typename OUT, typename ...ARGs>
-		void init(Elemental<EL> elemental, std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
+		template <typename IN, typename OUT, typename ...ARGs>
+		void init(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 			scoreboard = new Scoreboard<IN, OUT>();
 			((Scoreboard<IN, OUT>*)scoreboard)->addWork(&input, &output);
 			//((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
@@ -158,8 +158,8 @@ public:
 			}
 		}
 
-		template <typename IN, typename OUT, typename ...ARGs>
-		void analyse(std::vector<OUT> &output, std::vector<IN> input, ARGs... args) {
+		template <typename EL, typename IN, typename OUT, typename ...ARGs>
+		void analyse(Elemental<EL> elemental, std::vector<OUT> &output, std::vector<IN> input, ARGs... args) {
 
 			size_t newWorkSize = 0;
 			while (duration != 0.0f);
