@@ -150,7 +150,7 @@ public:
 			sizeOfWork = input.size() / (nthreads * 16);
 			//std::cout << input[10] << std::endl;;
 			std::cout << "SIZE : " << sizeOfWork << std::endl;
-			for (int i = 0; i < sizeofWork + 1; i++) {
+			for (int i = 0; i < sizeOfWork + 1; i++) {
 				std::cout << "ITEM: " << output.at(i) << std::endl;
 			}
 			scoreboard = new Scoreboard<IN, OUT>();
