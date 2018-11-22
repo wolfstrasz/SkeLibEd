@@ -79,6 +79,10 @@ public:
 			// guard
 			std::mutex scoreboardInUse;
 
+			// startup analysis
+			double meanTime;
+
+
 		};
 		void* scoreboard;
 
@@ -152,17 +156,21 @@ public:
 			size_t newWorkSize = 0;
 			while (duration == 0.0f);
 			duration = duration * nthreads;
+			((Scoreboard<IN, OUT>*)scoreboard)->meanTime = duration;
 			while (duration > 0.0f) {
 
 				tstart = std::chrono::high_resolution_clock::now();
 				output->at(newWorkSize) = elemental.elemental(input->at(newWorkSize), args...);
 				tend = std::chrono::high_resolution_clock::now();
+				std::cout << "Item Time: " << (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count() << "\n";
 				duration -= (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 				newWorkSize++;
 			}
 			sizeOfWork = newWorkSize;
 
 			// send work size
+			((Scoreboard<IN, OUT>*)scoreboard)->meanTime /= sizeOfWork;
+			std::cout << "Mean Time: " << ((Scoreboard<IN, OUT>*)scoreboard)->meanTime << "\n";
 			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
 			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 		}
