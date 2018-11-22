@@ -120,12 +120,12 @@ public:
 					if (elementIndex + elementsFinished == 10) {
 						std::cout << " THREDI\n";
 
-						std::cout << scoreboard->output[10];
+						std::cout << scoreboard->output->at(10);
 					}
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
 					if (elementIndex + elementsFinished == 10) {
 						std::cout << " THREDI\n";
-						std::cout << scoreboard->output[10];
+						std::cout << scoreboard->output->at(10);
 					}
 				}
 			}
