@@ -138,13 +138,10 @@ public:
 		template <typename IN, typename OUT, typename ...ARGs>
 		void init(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 			sizeOfWork = input.size() / (nthreads * 16);
-			//std::thread *THREADS[nthreads];
-			//Scoreboard<IN, OUT> *scoreboard = new Scoreboard<IN, OUT>();
 			scoreboard = new Scoreboard<IN, OUT>();
 			((Scoreboard<IN, OUT>*)scoreboard)->addWork(&input, &output);
 			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
-			//std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 			for (size_t t = 0; t < nthreads; t++) {
 				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, ((Scoreboard<IN, OUT>*)scoreboard), args...);
 			}
@@ -157,7 +154,7 @@ public:
 
 		//	if (!isInitialised) {
 
-				init(output, input, args...);
+				//init(output, input, args...);
 				////////////////////////////////////////////////////////////////////
 				//tt = new std::thread(&DynamicMapImplementation<EL>::init,this, output, input, args...);
 
