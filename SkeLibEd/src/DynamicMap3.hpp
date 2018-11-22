@@ -164,6 +164,7 @@ public:
 			size_t newWorkSize = 0;
 			while (duration == 0.0f);
 			while (duration > 0.0f) {
+				std::cout << "STARTING ANALYSIS\n";
 				tstart = std::chrono::high_resolution_clock::now();
 				output->at(newWorkSize) = elemental.elemental(input->at(newWorkSize), args...);
 				tend = std::chrono::high_resolution_clock::now();
@@ -179,6 +180,7 @@ public:
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 			if (!isInitialised) {
+				std::cout << "STARTING INITIALISATION\n";
 				//sizeOfWork = input.size() / (nthreads * 16);
 				duration = 0.0f;
 
