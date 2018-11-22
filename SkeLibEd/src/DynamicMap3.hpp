@@ -170,7 +170,7 @@ public:
 			size_t newWorkSize = 0;
 			while (duration == 0.0f);
 		//	std::cout << "STARTING ANALYSIS\n";
-			duration = duration * nthreads;
+			duration = duration;// *nthreads;
 			while (duration > 0.0f) {
 				
 				tstart = std::chrono::high_resolution_clock::now();
