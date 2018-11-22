@@ -226,8 +226,9 @@ public:
 
 			// Join threads
 			// ------------
-
-			for (size_t t = 0; t < nthreads; ++t) { allThreads[t]->join(); delete allThreads[t]; }
+			std::cout << "STARTING INITIALISATION\n";
+			for (size_t t = 0; t < nthreads; ++t) { allThreads[t]->join(); delete allThreads[t]; std::cout << "DELETED TREAD\n";
+			}
 			delete allThreads;
 			delete ((Scoreboard<IN, OUT>*)scoreboard);
 			isInitialised = false;
