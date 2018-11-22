@@ -187,7 +187,6 @@ public:
 		// -----------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
-			std::thread *threader;
 		//	std::cout << isInitialised << "\n";
 			if (!isInitialised) {
 		//		std::cout << "STARTING INITIALISATION\n";
@@ -195,8 +194,9 @@ public:
 				sizeOfWork = 0;
 				duration = 0.0f;
 				
-
-			
+				// USE THREADER
+				// -----------------------------------------------------------------------------
+				std::thread *threader;
 			//	std::cout << "STARTING INITIALISATION\n";
 				tstart = std::chrono::high_resolution_clock::now();
 				threader = new std::thread(&DynamicMapImplementation<EL>::init<IN, OUT, ARGs...>, this, &output, &input, args...);
@@ -207,9 +207,12 @@ public:
 			//	std::cout << sizeOfWork << std::endl;
 				((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
 				((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
-			/*	threader->join();
+				threader->join();
 				delete threader;
-				std::cout << "STARTING INITIALISATION\n";*/
+
+
+				// USE ANALYSER
+				// -----------------------------------------------------------------------------
 				//std::thread *analyser;
 				//tstart = std::chrono::high_resolution_clock::now();
 				////analyser = new std::thread(&DynamicMapImplementation<EL>::analyse<IN,OUT,ARGs...>, this, &output, &input, args...);
@@ -235,8 +238,7 @@ public:
 			delete allThreads;
 			delete ((Scoreboard<IN, OUT>*)scoreboard);
 			isInitialised = false;
-			threader->join();
-			delete threader;
+		
 		//	std::cout << "STARTING INITIALISATION\n";
 		}
 
