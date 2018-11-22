@@ -184,7 +184,7 @@ public:
 
 				std::thread *analyser;
 				tstart = std::chrono::high_resolution_clock::now();
-				analyser = new std::thread(&DynamicMapImplementation<EL>::analyse<IN,OUT,ARGs...>, this, output/*, input, args...*/);
+				analyser = new std::thread(&DynamicMapImplementation<EL>::analyse<IN,OUT,ARGs...>, this, &output/*, input, args...*/);
 				tend = std::chrono::high_resolution_clock::now();
 				duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 
