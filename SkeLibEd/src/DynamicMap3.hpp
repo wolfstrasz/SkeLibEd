@@ -143,6 +143,7 @@ public:
 			scoreboard = new Scoreboard<IN, OUT>();
 			((Scoreboard<IN, OUT>*)scoreboard)->addWork(&input, &output);
 			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
+			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
 			//std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 			for (size_t t = 0; t < nthreads; t++) {
 				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, ((Scoreboard<IN, OUT>*)scoreboard), args...);
@@ -156,36 +157,45 @@ public:
 
 			if (!isInitialised) {
 
-			
-			////////////////////////////////////////////////////////////////////
-			//tt = new std::thread(&DynamicMapImplementation<EL>::init,this, output, input, args...);
+				init(output, input, args...);
+				////////////////////////////////////////////////////////////////////
+				//tt = new std::thread(&DynamicMapImplementation<EL>::init,this, output, input, args...);
 
-			std::thread *tt;
-			tstart = std::chrono::high_resolution_clock::now();
-			//tt = new std::thread(&DynamicMapImplementation<EL>::stop, this);
-			tend = std::chrono::high_resolution_clock::now();
-			duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
+		//		std::thread *tt;
+		//		tstart = std::chrono::high_resolution_clock::now();
+		//		//tt = new std::thread(&DynamicMapImplementation<EL>::stop, this);
+		//		tend = std::chrono::high_resolution_clock::now();
+		//		duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
+		////		std::cout << "FF THREAD start:\n";
+		////		std::cout << duration << "\n";
+		//		tt->join();
+		//		delete tt;
 
-	//		std::cout << "FF THREAD start:\n";
-	//		std::cout << duration << "\n";
-
-			tt->join();
-			delete tt;
-
-
+				size_t newWorkSize = 0;
+				while (duration > 0.0f) {
+					tstart = std::chrono::high_resolution_clock::now();
+					((Scoreboard<IN, OUT>*)scoreboard)->output->at(elementIndex + elementsFinished) = 
+						elemental.elemental(((Scoreboard<IN, OUT>*)scoreboard)->input->at(elementIndex + elementsFinished), args...);
+					tend = std::chrono::high_resolution_clock::now();
+					duration -= (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
+					newWorkSize++;
+				}
+				std::cout <<" NEW WORK SIZE: "<< newWorkSize << std::endl;
+				sizeOfWork = newWorkSize;
 				init(output, input, args...);
 				isInitialised = true;
 			}
-			
-			stop();
-		}
-		template<typename IN, typename OUT>
-		bool stop() {
+
 			// Join threads
 			// ------------
 			for (size_t t = 0; t < nthreads; ++t) { allThreads[t]->join(); delete allThreads[t]; }
 			delete allThreads;
 			delete ((Scoreboard<IN, OUT>*)scoreboard);
+			//stop();
+		}
+
+		void stop() {
+		
 		}
 
 
