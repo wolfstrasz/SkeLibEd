@@ -178,8 +178,8 @@ public:
 				duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 		////		std::cout << "FF THREAD start:\n";
 		////		std::cout << duration << "\n";
-		//		tt->join();
-		//		delete tt;
+				tt->join();
+				delete tt;
 				std::cout << "DURATION : " << duration<< std::endl;
 				size_t newWorkSize = 0;
 				while (duration > 0.0f) {
