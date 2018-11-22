@@ -71,7 +71,7 @@ namespace collatz {
 
 		//	auto dynamicMap = DynamicMap(collatz_elemental, threadcount, itemcount / (blockcount * threadcount));
 			auto dynamicMap = DynamicMap(collatz_elemental);
-			std::cout << "DYNAMIC MAP Test: " << test << std::endl;
+		//	std::cout << "DYNAMIC MAP Test: " << test << std::endl;
 			dynamicMap(dynMapOut, in, arg);
 			//dynamicMap.stop();
 
