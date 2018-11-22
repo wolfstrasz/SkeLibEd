@@ -155,7 +155,7 @@ public:
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 
-			if (!isInitialised) {
+		//	if (!isInitialised) {
 
 				init(output, input, args...);
 				////////////////////////////////////////////////////////////////////
@@ -182,8 +182,8 @@ public:
 				std::cout <<" NEW WORK SIZE: "<< newWorkSize << std::endl;
 				sizeOfWork = newWorkSize;*/
 				init(output, input, args...);
-				isInitialised = true;
-			}
+			//	isInitialised = true;
+		//	}
 
 			// Join threads
 			// ------------
