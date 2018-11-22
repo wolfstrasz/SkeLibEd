@@ -90,8 +90,8 @@ public:
 
 			size_t elementsCount;
 			size_t elementIndex;
-			std::cout << scoreboard->itemsCount;
-			std::cout << scoreboard->curIndex;
+	//		std::cout << scoreboard->itemsCount;
+	//		std::cout << scoreboard->curIndex;
 			while (!scoreboard->isFinished) {
 				// Lock scoreboard
 				while (!scoreboard->scoreboardInUse.try_lock());
@@ -150,7 +150,7 @@ public:
 	public:
 		template <typename IN, typename OUT, typename ...ARGs>
 		void init(std::vector<OUT> *output, std::vector<IN> *input, ARGs... args) {
-			std::cout << "STARTING INIT\n";
+		//	std::cout << "STARTING INIT\n";
 
 			scoreboard = new Scoreboard<IN, OUT>();
 			((Scoreboard<IN, OUT>*)scoreboard)->addWork(input, output);
@@ -169,7 +169,7 @@ public:
 
 			size_t newWorkSize = 0;
 			while (duration == 0.0f);
-			std::cout << "STARTING ANALYSIS\n";
+		//	std::cout << "STARTING ANALYSIS\n";
 			duration = duration * nthreads;
 			while (duration > 0.0f) {
 				
@@ -190,7 +190,7 @@ public:
 			std::thread *threader;
 		//	std::cout << isInitialised << "\n";
 			if (!isInitialised) {
-				std::cout << "STARTING INITIALISATION\n";
+		//		std::cout << "STARTING INITIALISATION\n";
 				//sizeOfWork = input.size() / (nthreads * 16);
 				sizeOfWork = 0;
 				duration = 0.0f;
