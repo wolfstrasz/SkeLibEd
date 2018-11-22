@@ -146,7 +146,7 @@ public:
 
 
 	public:
-		template <typename IN, typename OUT, typename ...ARGs>
+		template <typename EL, typename IN, typename OUT, typename ...ARGs>
 		void init(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 			scoreboard = new Scoreboard<IN, OUT>();
 			((Scoreboard<IN, OUT>*)scoreboard)->addWork(&input, &output);
