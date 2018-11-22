@@ -201,6 +201,7 @@ public:
 				tstart = std::chrono::high_resolution_clock::now();
 				threader = new std::thread(&DynamicMapImplementation<EL>::init<IN, OUT, ARGs...>, this, &output, &input, args...);
 				tend = std::chrono::high_resolution_clock::now();
+				duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 				std::cout << "STARTING INITIALISATION\n";
 				analyse(&output, &input, args...);
 				std::cout << sizeOfWork << std::endl;
