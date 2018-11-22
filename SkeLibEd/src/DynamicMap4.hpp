@@ -79,7 +79,7 @@ public:
 			// guard
 			std::mutex scoreboardInUse;
 
-			// startup analysis
+			// analysis
 			double meanTime;
 
 
@@ -91,9 +91,12 @@ public:
 		// --------------------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void threadMap(Scoreboard<IN, OUT> *scoreboard, ARGs... args) {
-
 			size_t elementsCount;
 			size_t elementIndex;
+			double scoreTime;
+			double workTime;
+			std::chrono::high_resolution_clock::time_point wstart;
+			std::chrono::high_resolution_clock::time_point wend;
 			while (!scoreboard->isFinished) {
 				// Lock scoreboard
 				while (!scoreboard->scoreboardInUse.try_lock());
@@ -115,13 +118,32 @@ public:
 					scoreboard->curIndex += elementsCount;
 					scoreboard->isFinished = true;
 				}
+				scoreTime = scoreboard->meanTime;
 				// unlock scoreboard
 				scoreboard->scoreboardInUse.unlock();
+
 
 				// Process the data block
 				// ----------------------
 				for (int elementsFinished = 0; elementsFinished < elementsCount; elementsFinished++) {
+					wstart = std::chrono::high_resolution_clock::now();
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
+					wend = std::chrono::high_resolution_clock::now();
+					workTime = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(wend - wstart).count();
+
+					if (workTime > scoreTime * 1.25f) {
+						// lessen work
+						while (!scoreboard->scoreboardInUse.try_lock());
+						scoreboard->itemsCount = scoreboard->itemsCount / 2;
+						scoreboard->meanTime = workTime;
+						scoreboard->scoreboardInUse.unlock();
+					} else if (workTime < scoreTime * 0.75f) {
+						// increase work
+						while (!scoreboard->scoreboardInUse.try_lock());
+						scoreboard->itemsCount = scoreboard->itemsCount * 2;
+						scoreboard->meanTime = workTime;
+						scoreboard->scoreboardInUse.unlock();
+					}
 				}
 			}
 
