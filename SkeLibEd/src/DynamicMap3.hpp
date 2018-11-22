@@ -179,7 +179,7 @@ public:
 			
 			stop();
 		}
-
+		template<typename IN, typename OUT>
 		bool stop() {
 			// Join threads
 			// ------------
