@@ -162,7 +162,7 @@ public:
 		void analyse(std::vector<OUT> *output , std::vector<IN> *input, ARGs... args) {
 
 			size_t newWorkSize = 0;
-			while (duration != 0.0f);
+			while (duration == 0.0f);
 			while (duration > 0.0f) {
 				tstart = std::chrono::high_resolution_clock::now();
 				output->at(newWorkSize) = elemental.elemental(input->at(newWorkSize), args...);
