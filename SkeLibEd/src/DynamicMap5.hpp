@@ -34,26 +34,34 @@ public:
 	template<typename EL>
 	class DynamicMapImplementation {
 	private:
-		//unsigned char BLOCK_FLAG_INITIAL_VALUE;
-		size_t nthreads;
-		size_t sizeOfWork;
-		std::thread **allThreads;
-		bool isInitialised;
 		Elemental<EL> elemental;
+		size_t nthreads;
+		std::thread **allThreads;
+		
 		std::chrono::high_resolution_clock::time_point tstart;
 		std::chrono::high_resolution_clock::time_point tend;
 		double duration = 0.0f;
+		size_t sizeOfWork;
+		void* scoreboard;
 
 		template<typename IN, typename OUT>
 		class Scoreboard {
 		public:
+			// input output
+			std::vector<OUT> *output;
+			std::vector<IN> *input;
+			// detect global work
+			bool isFinished;
+			// detect next work
+			size_t inputSize;
+			size_t curIndex;
+			// scoreboard worksize
+			size_t itemsCount;
+			// guard
+			std::mutex scoreboardInUse;
+
 			// constructor
-			Scoreboard() {
-				this->isFinished = false;
-				this->curIndex = 0;
-			}
-			~Scoreboard() {}
-			void addWork(std::vector<IN> *in, std::vector<OUT> *out) {
+			Scoreboard(std::vector<IN> *in, std::vector<OUT> *out) {
 				this->input = in;
 				this->output = out;
 				isFinished = false;
@@ -61,26 +69,9 @@ public:
 				curIndex = 0;
 				itemsCount = 0;
 			}
-
-			// input output
-			std::vector<OUT> *output;
-			std::vector<IN> *input;
-
-			// detect global work
-			bool isFinished;
-
-			// detect next work
-			size_t inputSize;
-			size_t curIndex;
-
-			// scoreboard worksize
-			size_t itemsCount;
-
-			// guard
-			std::mutex scoreboardInUse;
-
+			~Scoreboard() {}
 		};
-		void* scoreboard;
+		
 
 
 		// ThreadMap - function applied to each thread
@@ -127,33 +118,38 @@ public:
 		// -----------
 		DynamicMapImplementation(Elemental<EL> elemental) : elemental(elemental) {
 			this->nthreads = std::thread::hardware_concurrency();
-			this->sizeOfWork = 1000;
-			allThreads = new std::thread*[nthreads];
-			this->isInitialised = false;
+			this->sizeOfWork = 0;
+			this->duration = 0.0f;
+			this->allThreads = new std::thread*[nthreads];
 		}
 
 	public:
 		template <typename IN, typename OUT, typename ...ARGs>
 		void init(std::vector<OUT> *output, std::vector<IN> *input, ARGs... args) {
+
 			// init scoreboard
-			scoreboard = new Scoreboard<IN, OUT>();
+			while (!((Scoreboard<IN, OUT>*)scoreboard)->scoreboardInUse.try_lock());
 			((Scoreboard<IN, OUT>*)scoreboard)->addWork(input, output);
 			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
+			((Scoreboard<IN, OUT>*)scoreboard)->scoreboardInUse.unlock();
+
 			// create threads
 			for (size_t t = 0; t < nthreads; t++) {
-				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, ((Scoreboard<IN, OUT>*)scoreboard), args...);
+				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, 
+													this, ((Scoreboard<IN, OUT>*)scoreboard), args...);
 			}
 		}
 
 		template <typename IN, typename OUT, typename ...ARGs>
-		void analyse(std::vector<OUT> *output , std::vector<IN> *input, ARGs... args) {
+		void analyse(std::vector<OUT> *output, std::vector<IN> *input, ARGs... args) {
 
 			size_t newWorkSize = 0;
-			while (duration == 0.0f);
-			duration = duration *nthreads;
+			while (duration == 0.0f);			// guard if we are using analyser
+			duration = duration * nthreads;
+
+			// analyse worksize
 			while (duration > 0.0f) {
-				
 				tstart = std::chrono::high_resolution_clock::now();
 				output->at(newWorkSize) = elemental.elemental(input->at(newWorkSize), args...);
 				tend = std::chrono::high_resolution_clock::now();
@@ -163,8 +159,10 @@ public:
 			sizeOfWork = newWorkSize;
 
 			// send work size
+			while (!scoreboard->scoreboardInUse.try_lock());
 			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
 			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
+			((Scoreboard<IN, OUT>*)scoreboard)->scoreboardInUse.unlock();
 		}
 
 
@@ -172,56 +170,48 @@ public:
 		// -----------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
-			if (!isInitialised) {
-				sizeOfWork = 0;
-				duration = 0.0f;
-				
-				// USE THREADER
-				// -----------------------------------------------------------------------------
-				// start threader
-				std::thread *threader;
-				tstart = std::chrono::high_resolution_clock::now();
-				threader = new std::thread(&DynamicMapImplementation<EL>::init<IN, OUT, ARGs...>, this, &output, &input, args...);
-				tend = std::chrono::high_resolution_clock::now();
-				duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
-				// main thread analyses
-				analyse(&output, &input, args...);
-				
+			scoreboard = new Scoreboard<IN, OUT>();
 
-				// delete threader
-				threader->join();
-				delete threader;
+			// USE THREADER
+			// -----------------------------------------------------------------------------------
+			// start threader
+			std::thread *threader;
+			tstart = std::chrono::high_resolution_clock::now();
+			threader = new std::thread(&DynamicMapImplementation<EL>::init<IN, OUT, ARGs...>, this, &output, &input, args...);
+			tend = std::chrono::high_resolution_clock::now();
+			duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
+			// main thread analyses
+			analyse(&output, &input, args...);
 
 
-				// USE ANALYSER
-				// -----------------------------------------------------------------------------
-				// start analyser
-				//std::thread *analyser;
-				//tstart = std::chrono::high_resolution_clock::now();
-				////analyser = new std::thread(&DynamicMapImplementation<EL>::analyse<IN,OUT,ARGs...>, this, &output, &input, args...);
-				//analyse(&output, &input, args...);
-				//tend = std::chrono::high_resolution_clock::now();
-				//duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
+			// delete threader
+			threader->join();
+			delete threader;
 
-				// main thread initialises threads
-				//init(output, input, args...);
 
-				//analyser->join();
-				//delete analyser;
+			// USE ANALYSER
+			// -----------------------------------------------------------------------------------
+			// start analyser
+			//std::thread *analyser;
+			//tstart = std::chrono::high_resolution_clock::now();
+			////analyser = new std::thread(&DynamicMapImplementation<EL>::analyse<IN,OUT,ARGs...>, this, &output, &input, args...);
+			//analyse(&output, &input, args...);
+			//tend = std::chrono::high_resolution_clock::now();
+			//duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 
-				isInitialised = true;
-			}
+			// main thread initialises threads
+			//init(output, input, args...);
+
+			//analyser->join();
+			//delete analyser;
+
 
 			// Join threads
-			// ------------
+			// -----------------------------------------------------------------------------------
 			for (size_t t = 0; t < nthreads; ++t) { allThreads[t]->join(); delete allThreads[t]; }
 			delete allThreads;
 			delete ((Scoreboard<IN, OUT>*)scoreboard);
-		
-		}
 
-		void stop() {
-		
 		}
 
 		// Friend Functions for Dynamic Map Implementation Class
