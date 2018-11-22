@@ -156,9 +156,11 @@ public:
 			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
 			// ITEM COUNT = 0
+			std::cout << "STARTING INIT\n";
 			for (size_t t = 0; t < nthreads; t++) {
 				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, ((Scoreboard<IN, OUT>*)scoreboard), args...);
 			}
+			std::cout << "STARTING INIT\n";
 		}
 
 		template <typename IN, typename OUT, typename ...ARGs>
