@@ -181,6 +181,7 @@ public:
 		// -----------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
+			std::cout << isInitialised << "\n";
 			if (!isInitialised) {
 				std::cout << "STARTING INITIALISATION\n";
 				//sizeOfWork = input.size() / (nthreads * 16);
