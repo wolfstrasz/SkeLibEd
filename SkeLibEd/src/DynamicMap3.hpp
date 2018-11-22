@@ -164,8 +164,9 @@ public:
 
 			size_t newWorkSize = 0;
 			while (duration == 0.0f);
+			std::cout << "STARTING ANALYSIS\n";
 			while (duration > 0.0f) {
-				std::cout << "STARTING ANALYSIS\n";
+				
 				tstart = std::chrono::high_resolution_clock::now();
 				output->at(newWorkSize) = elemental.elemental(input->at(newWorkSize), args...);
 				tend = std::chrono::high_resolution_clock::now();
