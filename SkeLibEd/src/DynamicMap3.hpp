@@ -153,7 +153,7 @@ public:
 			scoreboard = new Scoreboard<IN, OUT>();
 			((Scoreboard<IN, OUT>*)scoreboard)->addWork(&input, &output);
 			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
-			//((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
+			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
 			for (size_t t = 0; t < nthreads; t++) {
 				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, ((Scoreboard<IN, OUT>*)scoreboard), args...);
 			}
@@ -191,7 +191,7 @@ public:
 					newWorkSize++;
 				}
 				std::cout <<" NEW WORK SIZE: "<< newWorkSize << std::endl;
-		//		sizeOfWork = newWorkSize;
+				sizeOfWork = newWorkSize;
 				init(output, input, args...);
 
 				/*std::cout << input[10] <<std::endl;;
