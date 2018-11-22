@@ -187,6 +187,7 @@ public:
 					output.at(newWorkSize) = elemental.elemental(input.at(newWorkSize), args...);
 					tend = std::chrono::high_resolution_clock::now();
 					duration -= (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
+					std::cout << "DURATION FOR ITEM: " << duration << std::endl;
 					newWorkSize++;
 				}
 				std::cout <<" NEW WORK SIZE: "<< newWorkSize << std::endl;
