@@ -38,10 +38,11 @@ public:
 		size_t nthreads;
 		size_t sizeOfWork;
 		std::thread **allThreads;
-	//	bool isInitialised;
+		bool isInitialised;
 		Elemental<EL> elemental;
 		std::chrono::high_resolution_clock::time_point tstart;
 		std::chrono::high_resolution_clock::time_point tend;
+		double duration = 0.0f;
 
 		template<typename IN, typename OUT>
 		class Scoreboard {
@@ -130,6 +131,10 @@ public:
 	//		this->isInitialised = false;
 		}
 
+
+
+
+	public:
 		template <typename IN, typename OUT, typename ...ARGs>
 		void init(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 			sizeOfWork = input.size() / (nthreads * 16);
@@ -138,78 +143,49 @@ public:
 			scoreboard = new Scoreboard<IN, OUT>();
 			((Scoreboard<IN, OUT>*)scoreboard)->addWork(&input, &output);
 			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+			//std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 			for (size_t t = 0; t < nthreads; t++) {
 				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, ((Scoreboard<IN, OUT>*)scoreboard), args...);
 			}
 		}
 
-
-	public:
 		// Paranthesis operator: call function
 		// -----------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 
-			//	if (!isInitialised) {
+			if (!isInitialised) {
 
-			init(output,input, args...);
+			
 			////////////////////////////////////////////////////////////////////
+			//tt = new std::thread(&DynamicMapImplementation<EL>::init,this, output, input, args...);
 
 			std::thread *tt;
 			tstart = std::chrono::high_resolution_clock::now();
-			tt = new std::thread(&DynamicMapImplementation<EL>::stop, this);
-			//tt = new std::thread(&DynamicMapImplementation<EL>::init,this, output, input, args...);
+			//tt = new std::thread(&DynamicMapImplementation<EL>::stop, this);
 			tend = std::chrono::high_resolution_clock::now();
-			auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
-			std::cout << "FF THREAD start:\n";
-			std::cout << duration << "\n";
+			duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 
+	//		std::cout << "FF THREAD start:\n";
+	//		std::cout << duration << "\n";
 
-			tstart = std::chrono::high_resolution_clock::now();
 			tt->join();
-			tend = std::chrono::high_resolution_clock::now();
-			duration = std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
-			std::cout << "FF THREAD join:\n";
-			std::cout << duration << "\n";
 			delete tt;
 
-			////////////////////////////////////////////////////////////////////
-			//sizeOfWork = input.size() / (nthreads * 16);
-			////std::thread *THREADS[nthreads];
-			////Scoreboard<IN, OUT> *scoreboard = new Scoreboard<IN, OUT>();
-			//scoreboard = new Scoreboard<IN, OUT>();
-			//((Scoreboard<IN, OUT>*)scoreboard)->addWork(&input, &output);
-			//((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 
-			// Run threads
-			// -----------
-			//std::cout << "RUNNING THREADS" << std::endl;
-		//	for (size_t t = 0; t < nthreads; t++) {
-		//		tstart = std::chrono::high_resolution_clock::now();
-		//		allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, ((Scoreboard<IN, OUT>*)scoreboard), args...);
-		//		tend = std::chrono::high_resolution_clock::now();
-		//		auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
-		//		std::cout << "THREAD: " << t << "\n";
-		//		std::cout << duration << "\n";
-		//	}
-			//		isInitialised = true;
-		//		}
-					// Join threads
-				// ------------
-			//for (size_t t = 0; t < nthreads; ++t) { THREADS[t]->join(); delete THREADS[t]; }
-			for (size_t t = 0; t < nthreads; ++t) { allThreads[t]->join(); delete allThreads[t]; }
-			delete allThreads;
-			delete ((Scoreboard<IN, OUT>*)scoreboard);
-
+				init(output, input, args...);
+				isInitialised = true;
+			}
+			
+			stop();
 		}
 
 		bool stop() {
 			// Join threads
 			// ------------
-//			for (size_t t = 0; t < nthreads; ++t) { THREADS[t]->join(); delete THREADS[t]; }
-
-		//	delete scoreboard;
+			for (size_t t = 0; t < nthreads; ++t) { allThreads[t]->join(); delete allThreads[t]; }
+			delete allThreads;
+			delete ((Scoreboard<IN, OUT>*)scoreboard);
 		}
 
 
