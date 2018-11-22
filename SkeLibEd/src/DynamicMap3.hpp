@@ -90,8 +90,9 @@ public:
 
 			size_t elementsCount;
 			size_t elementIndex;
+			std::cout << scoreboard->itemsCount;
+			std::cout << scoreboard->curIndex;
 			while (!scoreboard->isFinished) {
-
 				// Lock scoreboard
 				while (!scoreboard->scoreboardInUse.try_lock());
 
