@@ -157,7 +157,7 @@ public:
 				//init(output, input, args...);
 				////////////////////////////////////////////////////////////////////
 				//tt = new std::thread(&DynamicMapImplementation<EL>::init,this, output, input, args...);
-
+				
 				std::thread *tt;
 				tstart = std::chrono::high_resolution_clock::now();
 				tt = new std::thread(&DynamicMapImplementation<EL>::stop, this);
@@ -178,7 +178,7 @@ public:
 				}
 				std::cout <<" NEW WORK SIZE: "<< newWorkSize << std::endl;
 				sizeOfWork = newWorkSize;*/
-				init(&output, &input, args...);
+				init(output, input, args...);
 			//	isInitialised = true;
 		//	}
 
