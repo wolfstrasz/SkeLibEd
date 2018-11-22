@@ -186,6 +186,7 @@ public:
 		// -----------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
+			std::thread *threader;
 			std::cout << isInitialised << "\n";
 			if (!isInitialised) {
 				std::cout << "STARTING INITIALISATION\n";
@@ -194,7 +195,7 @@ public:
 				duration = 0.0f;
 				
 
-				std::thread *threader;
+			
 				std::cout << "STARTING INITIALISATION\n";
 				tstart = std::chrono::high_resolution_clock::now();
 				threader = new std::thread(&DynamicMapImplementation<EL>::init<IN, OUT, ARGs...>, this, &output, &input, args...);
