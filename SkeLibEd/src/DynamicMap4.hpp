@@ -81,7 +81,7 @@ public:
 
 			// analysis
 			double meanTime;
-
+			size_t startItems;
 
 		};
 		void* scoreboard;
@@ -130,17 +130,19 @@ public:
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
 					wend = std::chrono::high_resolution_clock::now();
 					workTime = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(wend - wstart).count();
-					std::cout << workTime << std::endl;
-					if (workTime > scoreTime * 1.50f && workTime < scoreTime * 2.00f) {
+					//std::cout << workTime << std::endl;
+					if (workTime > scoreTime * 1.50f && workTime < scoreTime * 2.00f && scoreboard->itemsCount != (scoreboard->startItems / 2)) {
 						// lessen work
 						while (!scoreboard->scoreboardInUse.try_lock());
 						scoreboard->itemsCount = scoreboard->itemsCount / 2;
+						std::cout << "Item count: " << scoreboard->itemsCount << std::endl;
 						scoreboard->meanTime = workTime;
 						scoreboard->scoreboardInUse.unlock();
-					} else if (workTime * 1.50f < scoreTime && workTime * 2.00f > scoreTime ) {
+					} else if (workTime * 1.50f < scoreTime && workTime * 2.00f > scoreTime && scoreboard->itemsCount != (scoreboard->startItems *2)) {
 						// increase work
 						while (!scoreboard->scoreboardInUse.try_lock());
 						scoreboard->itemsCount = scoreboard->itemsCount * 2;
+						std::cout << "Item count: " << scoreboard->itemsCount << std::endl;
 						scoreboard->meanTime = workTime;
 						scoreboard->scoreboardInUse.unlock();
 					}
@@ -192,6 +194,8 @@ public:
 			// send work size
 
 			((Scoreboard<IN, OUT>*)scoreboard)->meanTime /= sizeOfWork;
+			if (sizeOfWork % 2 == 1)sizeOfWork--;
+			((Scoreboard<IN, OUT>*)scoreboard)->startItems = sizeOfWork;
 			std::cout << "Mean Time: " << ((Scoreboard<IN, OUT>*)scoreboard)->meanTime << "\n";
 			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
 			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
