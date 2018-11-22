@@ -148,7 +148,7 @@ public:
 		template <typename IN, typename OUT, typename ...ARGs>
 		void init(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 			sizeOfWork = input.size() / (nthreads * 16);
-			std::cout << input[10] << std::endl;;
+			//std::cout << input[10] << std::endl;;
 
 			scoreboard = new Scoreboard<IN, OUT>();
 			((Scoreboard<IN, OUT>*)scoreboard)->addWork(&input, &output);
@@ -181,7 +181,7 @@ public:
 		//		tt->join();
 		//		delete tt;
 
-			/*	size_t newWorkSize = 0;
+				size_t newWorkSize = 0;
 				while (duration > 0.0f) {
 					tstart = std::chrono::high_resolution_clock::now();
 					output.at(newWorkSize) = elemental.elemental(input.at(newWorkSize), args...);
@@ -190,7 +190,7 @@ public:
 					newWorkSize++;
 				}
 				std::cout <<" NEW WORK SIZE: "<< newWorkSize << std::endl;
-				sizeOfWork = newWorkSize;*/
+		//		sizeOfWork = newWorkSize;
 				init(output, input, args...);
 
 				/*std::cout << input[10] <<std::endl;;
