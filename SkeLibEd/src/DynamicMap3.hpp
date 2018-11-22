@@ -158,8 +158,8 @@ public:
 			}
 		}
 
-		template <typename EL, typename IN, typename OUT, typename ...ARGs>
-		void analyse(Elemental<EL> elemental, std::vector<OUT> &output, std::vector<IN> input, ARGs... args) {
+		template <typename IN, typename OUT, typename ...ARGs>
+		void analyse(std::vector<OUT> &output, std::vector<IN> input, ARGs... args) {
 
 			size_t newWorkSize = 0;
 			while (duration != 0.0f);
@@ -172,6 +172,8 @@ public:
 			}
 			sizeOfWork = newWorkSize;
 		}
+
+
 		// Paranthesis operator: call function
 		// -----------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
@@ -182,7 +184,7 @@ public:
 
 				std::thread *analyser;
 				tstart = std::chrono::high_resolution_clock::now();
-				analyser = new std::thread(&DynamicMapImplementation<EL>::analyse, this, elemental, output, input, args...);
+				analyser = new std::thread(&DynamicMapImplementation<EL>::analyse<IN,OUT,ARGs...>, this, output, input, args...);
 				tend = std::chrono::high_resolution_clock::now();
 				duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 
