@@ -147,7 +147,7 @@ public:
 	public:
 		template <typename IN, typename OUT, typename ...ARGs>
 		void init(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
-			sizeOfWork = input.size() / (nthreads * 16);
+			//sizeOfWork = input.size() / (nthreads * 16);
 			//std::cout << input[10] << std::endl;;
 			std::cout << "SIZE : " << sizeOfWork << std::endl;
 			for (int i = 0; i < sizeOfWork + 1; i++) {
