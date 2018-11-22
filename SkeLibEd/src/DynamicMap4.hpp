@@ -130,7 +130,7 @@ public:
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
 					wend = std::chrono::high_resolution_clock::now();
 					workTime = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(wend - wstart).count();
-					std::cout << workTime << endl;
+					std::cout << workTime << std::endl;
 					if (workTime > scoreTime * 1.50f && workTime < scoreTime * 2.00f) {
 						// lessen work
 						while (!scoreboard->scoreboardInUse.try_lock());
