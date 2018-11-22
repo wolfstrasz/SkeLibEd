@@ -131,13 +131,13 @@ public:
 					wend = std::chrono::high_resolution_clock::now();
 					workTime = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(wend - wstart).count();
 
-					if (workTime > scoreTime * 1.25f) {
+					if (workTime > scoreTime * 1.25f && workTime < scoreTime * 2.00f) {
 						// lessen work
 						while (!scoreboard->scoreboardInUse.try_lock());
 						scoreboard->itemsCount = scoreboard->itemsCount / 2;
 						scoreboard->meanTime = workTime;
 						scoreboard->scoreboardInUse.unlock();
-					} else if (workTime < scoreTime * 0.75f) {
+					} else if (workTime < scoreTime * 0.75f && workTime > scoreTime * 0.50f) {
 						// increase work
 						while (!scoreboard->scoreboardInUse.try_lock());
 						scoreboard->itemsCount = scoreboard->itemsCount * 2;
