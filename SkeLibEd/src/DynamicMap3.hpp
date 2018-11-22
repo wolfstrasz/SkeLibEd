@@ -205,7 +205,7 @@ public:
 				((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 				threader->join();
 				delete threader;
-
+				std::cout << "STARTING INITIALISATION\n";
 				//std::thread *analyser;
 				//tstart = std::chrono::high_resolution_clock::now();
 				////analyser = new std::thread(&DynamicMapImplementation<EL>::analyse<IN,OUT,ARGs...>, this, &output, &input, args...);
@@ -219,10 +219,6 @@ public:
 				//((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
 				//((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 				//delete analyser;
-
-
-
-
 
 				isInitialised = true;
 			}
