@@ -139,7 +139,7 @@ public:
 		DynamicMapImplementation(Elemental<EL> elemental) : elemental(elemental) {
 			this->nthreads = std::thread::hardware_concurrency();
 			this->sizeOfWork = 1000;
-			allThreads = (std::thread**)malloc(nthreads * sizeof(std::thread *));
+			allThreads = new std::thread*[nthreads];
 	//		this->isInitialised = false;
 		}
 
@@ -209,7 +209,7 @@ public:
 			// ------------
 
 			for (size_t t = 0; t < nthreads; ++t) { allThreads[t]->join(); delete allThreads[t]; }
-			free(allThreads);
+			delete allThreads;
 			delete ((Scoreboard<IN, OUT>*)scoreboard);
 
 		}
