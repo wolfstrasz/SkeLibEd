@@ -131,21 +131,21 @@ public:
 					wend = std::chrono::high_resolution_clock::now();
 					workTime = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(wend - wstart).count();
 					//std::cout << workTime << std::endl;
-					if (workTime > scoreTime * 1.50f && workTime < scoreTime * 2.00f ) {
+					if (workTime > scoreTime * 1.50f && workTime < scoreTime * 1.75f ) {
 						// lessen work
 						while (!scoreboard->scoreboardInUse.try_lock());
 						if (scoreboard->itemsCount != (scoreboard->startItems / 2)) {
 							scoreboard->itemsCount = scoreboard->itemsCount / 2;
-							std::cout << "Item count: " << scoreboard->itemsCount << std::endl;
+					//		std::cout << "Item count: " << scoreboard->itemsCount << std::endl;
 							scoreboard->meanTime = workTime;
 						}
 						scoreboard->scoreboardInUse.unlock();
-					} else if (workTime * 1.50f < scoreTime && workTime * 2.00f > scoreTime) {
+					} else if (workTime * 1.50f < scoreTime && workTime * 1.75f > scoreTime) {
 						// increase work
 						while (!scoreboard->scoreboardInUse.try_lock());
 						if ( scoreboard->itemsCount != (scoreboard->startItems * 2)) {
 							scoreboard->itemsCount = scoreboard->itemsCount * 2;
-							std::cout << "Item count: " << scoreboard->itemsCount << std::endl;
+					//		std::cout << "Item count: " << scoreboard->itemsCount << std::endl;
 							scoreboard->meanTime = workTime;
 						}
 						scoreboard->scoreboardInUse.unlock();
