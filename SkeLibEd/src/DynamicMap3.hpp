@@ -171,11 +171,11 @@ public:
 				////////////////////////////////////////////////////////////////////
 				//tt = new std::thread(&DynamicMapImplementation<EL>::init,this, output, input, args...);
 				
-		/*		std::thread *tt;
+				std::thread *tt;
 				tstart = std::chrono::high_resolution_clock::now();
 				tt = new std::thread(&DynamicMapImplementation<EL>::stop, this);
 				tend = std::chrono::high_resolution_clock::now();
-				duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();*/
+				duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 		////		std::cout << "FF THREAD start:\n";
 		////		std::cout << duration << "\n";
 		//		tt->join();
