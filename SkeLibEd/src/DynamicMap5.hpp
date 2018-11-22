@@ -159,7 +159,7 @@ public:
 			sizeOfWork = newWorkSize;
 
 			// send work size
-			while (!scoreboard->scoreboardInUse.try_lock());
+			while (!((Scoreboard<IN, OUT>*)scoreboard)->scoreboardInUse.try_lock());
 			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
 			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 			((Scoreboard<IN, OUT>*)scoreboard)->scoreboardInUse.unlock();
