@@ -62,7 +62,7 @@ public:
 			std::mutex scoreboardLock;
 
 			// timing
-			std::vector<double>* scoretiming;
+		//	std::vector<double>* scoretiming;
 		//	std::vector<double>* inittiming;
 			// constructor
 			Scoreboard(std::vector<IN> *in, std::vector<OUT> *out, size_t nthreads) {
@@ -73,7 +73,7 @@ public:
 				inputSize = in->size();
 				curIndex = 0;
 				jobSize = 0;
-				scoretiming = new std::vector<double>(nthreads);
+			//	scoretiming = new std::vector<double>(nthreads);
 			//	inittiming = new std::vector<double>(nthreads);
 			}
 			~Scoreboard() {}
@@ -85,12 +85,12 @@ public:
 		// --------------------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void threadMap(Scoreboard<IN, OUT> *scoreboard,size_t id, ARGs... args) {
-			std::chrono::high_resolution_clock::time_point thstart;
-			std::chrono::high_resolution_clock::time_point thend;
+		//	std::chrono::high_resolution_clock::time_point thstart;
+		//	std::chrono::high_resolution_clock::time_point thend;
 			size_t elementsCount;
 			size_t elementIndex;
 	//		double timeForInit = 0.0f;
-			double timeForScore = 0.0f;
+		//	double timeForScore = 0.0f;
 
 		//	thstart = std::chrono::high_resolution_clock::now();
 			while (!scoreboard->isInitialised);
@@ -100,10 +100,10 @@ public:
 
 			while (!scoreboard->isFinished) {
 				// Lock scoreboard
-				thstart = std::chrono::high_resolution_clock::now();
+			//	thstart = std::chrono::high_resolution_clock::now();
 				while (!scoreboard->scoreboardLock.try_lock());
-				thend = std::chrono::high_resolution_clock::now();
-				timeForScore += (double)std::chrono::duration_cast<std::chrono::nanoseconds>(thend - thstart).count();
+			//	thend = std::chrono::high_resolution_clock::now();
+			//	timeForScore += (double)std::chrono::duration_cast<std::chrono::nanoseconds>(thend - thstart).count();
 				if (scoreboard->isFinished) {
 					scoreboard->scoreboardLock.unlock();
 					break;
@@ -127,12 +127,12 @@ public:
 				// Process the data block
 				// ----------------------
 				for (int elementsFinished = 0; elementsFinished < elementsCount; elementsFinished++) {
-					if (elementIndex + elementsFinished >= scoreboard->inputSize)
-						std::cout << "ACCESS OUT OF RANGE AT THREAD: " << id << "\n";
+					//if (elementIndex + elementsFinished >= scoreboard->inputSize)
+					//	std::cout << "ACCESS OUT OF RANGE AT THREAD: " << id << "\n";
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
 				}
 			}
-			scoreboard->scoretiming->at(id) = timeForScore/1000.0f;
+		//	scoreboard->scoretiming->at(id) = timeForScore/1000.0f;
 		//	scoreboard->inittiming->at(id) = timeForInit;
 			//std::cout << "Time for init : " << timeForInit << "\n";
 			//std::cout << "Time for score : " << timeForScore << "\n";
@@ -168,8 +168,8 @@ public:
 			// analyse worksize
 			while (duration > 0.0f && newJobSize < input->size()) {
 				tstart = std::chrono::high_resolution_clock::now();
-				if (newJobSize >= input->size())
-					std::cout << "ACCESS OUT OF RANGE AT THREAD: MAIN: " << newJobSize << "\n";
+			//	if (newJobSize >= input->size())
+			//		std::cout << "ACCESS OUT OF RANGE AT THREAD: MAIN: " << newJobSize << "\n";
 				output->at(newJobSize) = elemental.elemental(input->at(newJobSize), args...);
 				tend = std::chrono::high_resolution_clock::now();
 				duration -= (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
@@ -234,8 +234,8 @@ public:
 			// -----------------------------------------------------------------------------------
 			for (size_t t = 0; t < nthreads; ++t) {
 				allThreads[t]->join();
-				std::cout << "THREAD ID:  " << t << "\n";
-				std::cout << "SCORE TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->scoretiming->at(t) << "\n";
+			//	std::cout << "THREAD ID:  " << t << "\n";
+			//	std::cout << "SCORE TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->scoretiming->at(t) << "\n";
 			//	std::cout << "INIT  TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->inittiming->at(t) << "\n";
 
 				delete allThreads[t]; 
