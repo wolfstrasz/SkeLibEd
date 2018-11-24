@@ -148,11 +148,12 @@ public:
 				wend = std::chrono::high_resolution_clock::now();
 				workTime = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(wend - wstart).count();
 				
-				//if (workTime > 1.25f || workTime < 0.75f) // more thant 1.25 milisecs work weight has increased
-				//{
-				//	meanTime = workTime / elementsCount;
-				//	meanElements = 1.00f / meanTime;
-				//}
+				workTime = workTime / 1000000;
+				if (workTime > 1.25f || workTime < 0.75f) // more thant 1.25 milisecs work weight has increased
+				{
+					meanTime = workTime / elementsCount;
+					meanElements = 1.00f / meanTime;
+				}
 			}
 
 		}
