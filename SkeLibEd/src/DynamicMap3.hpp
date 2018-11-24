@@ -52,6 +52,7 @@ public:
 			std::vector<IN> *input;
 			// detect global work
 			bool isFinished;
+			bool isInitialised;
 			// detect next work
 			size_t inputSize;
 			size_t curIndex;
@@ -65,6 +66,7 @@ public:
 				this->input = in;
 				this->output = out;
 				isFinished = false;
+				isInitialised = false;
 				inputSize = in->size();
 				curIndex = 0;
 				jobSize = 0;
@@ -81,6 +83,7 @@ public:
 
 			size_t elementsCount;
 			size_t elementIndex;
+			while (!scoreboard->isInitialised);
 			while (!scoreboard->isFinished) {
 				// Lock scoreboard
 				while (!scoreboard->scoreboardLock.try_lock());
@@ -163,7 +166,8 @@ public:
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 			scoreboard = new Scoreboard<IN, OUT>(&input, &output);
-
+			
+			std::cout << "THREADER INIT\n";
 			// USE THREADER
 			// -----------------------------------------------------------------------------------
 			// start threader
@@ -173,6 +177,7 @@ public:
 			tend = std::chrono::high_resolution_clock::now();
 			duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 			// main thread analyses
+			std::cout << "MAIN THREAD ANALYSIS\n";
 			start_analysis(&output, &input, args...);
 
 
