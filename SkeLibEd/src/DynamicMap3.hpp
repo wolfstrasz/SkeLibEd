@@ -127,12 +127,6 @@ public:
 		template <typename IN, typename OUT, typename ...ARGs>
 		void start_init(std::vector<OUT> *output, std::vector<IN> *input, ARGs... args) {
 
-			// init scoreboard
-			while (!((Scoreboard<IN, OUT>*)scoreboard)->scoreboardInUse.try_lock());
-			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
-			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
-			((Scoreboard<IN, OUT>*)scoreboard)->scoreboardInUse.unlock();
-
 			// create threads
 			for (size_t t = 0; t < nthreads; t++) {
 				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>,
