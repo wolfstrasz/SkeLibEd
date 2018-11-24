@@ -163,7 +163,7 @@ public:
 
 			size_t newJobSize = 0;
 			while (duration == 0.0f);			// guard if we are using analyser
-			duration = duration * nthreads * nthreads;
+			duration = duration * nthreads;
 
 			// analyse worksize
 			while (duration > 0.0f && newJobSize < input->size()) {
