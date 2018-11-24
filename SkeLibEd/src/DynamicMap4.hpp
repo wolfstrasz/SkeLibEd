@@ -65,12 +65,12 @@ public:
 			size_t startItems;
 			int counter = 0;
 			void switchWorkload(size_t newMeanWork) {
-				if (counter < 10) {
-					std::cout << "NEW WORK FROM: " << jobSize;
-					jobSize = (jobSize + newMeanWork) / 2;
-					jobSize = jobSize == 0 ? 1 : jobSize;
+				if (this->counter < 10) {
+					std::cout << "NEW WORK " << counter << " FROM: " << jobSize;
+					this->jobSize = (this->jobSize + newMeanWork) / 2;
+					this->jobSize = this->jobSize == 0 ? 1 : jobSize;
 					std::cout << "\tTO: " << jobSize << "\n";
-					counter++;
+					this->counter++;
 				}
 			//	std::getchar();
 			}
