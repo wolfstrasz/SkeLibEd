@@ -36,7 +36,6 @@ public:
 	private:
 		//unsigned char BLOCK_FLAG_INITIAL_VALUE;
 		size_t nthreads;
-		size_t sizeOfWork;
 		std::thread **allThreads;
 		bool isInitialised;
 		Elemental<EL> elemental;
@@ -47,42 +46,38 @@ public:
 		template<typename IN, typename OUT>
 		class Scoreboard {
 		public:
-			// constructor
-			Scoreboard() {
-				this->isFinished = false;
-				this->curIndex = 0;
-			}
-			~Scoreboard() {}
-			void addWork(std::vector<IN> *in, std::vector<OUT> *out) {
-				this->input = in;
-				this->output = out;
-				isFinished = false;
-				inputSize = in->size();
-				curIndex = 0;
-				itemsCount = 0;
-			}
-
 			// input output
 			std::vector<OUT> *output;
 			std::vector<IN> *input;
-
 			// detect global work
 			bool isFinished;
-
+			bool isInitialised;
 			// detect next work
 			size_t inputSize;
 			size_t curIndex;
-
 			// scoreboard worksize
-			size_t itemsCount;
-
+			size_t jobSize;
 			// guard
-			std::mutex scoreboardInUse;
+			std::mutex scoreboardLock;
 
 			// analysis
 			double meanTime;
 			size_t startItems;
-
+			// timing
+			//std::vector<double>* scoretiming;
+			// constructor
+			Scoreboard(std::vector<IN> *in, std::vector<OUT> *out, size_t nthreads) {
+				this->output = out;
+				this->input = in;
+				isFinished = false;
+				isInitialised = false;
+				inputSize = in->size();
+				curIndex = 0;
+				jobSize = 0;
+				meanTime = 1000 * 1000; // 1milisec
+				//scoretiming = new std::vector<double>(nthreads);
+			}
+			~Scoreboard() {}
 		};
 		void* scoreboard;
 
@@ -91,26 +86,40 @@ public:
 		// --------------------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void threadMap(Scoreboard<IN, OUT> *scoreboard, ARGs... args) {
-			size_t elementsCount;
-			size_t elementIndex;
-			double scoreTime;
-			double workTime;
+			//std::chrono::high_resolution_clock::time_point thstart;
+			//std::chrono::high_resolution_clock::time_point thend;
+			//double timeForScore = 0.0f;
+			//size_t jobsDone = 0;
+			
 			std::chrono::high_resolution_clock::time_point wstart;
 			std::chrono::high_resolution_clock::time_point wend;
+			double workTime;
+			double meanTime;
+			size_t meanElements;
+			size_t elementsCount;
+			size_t elementIndex;
+		//	double scoreTime;
+			
+			while (!scoreboard->isInitialised);
+			meanElements = scoreboard->jobSize;
+
 			while (!scoreboard->isFinished) {
 				// Lock scoreboard
-				while (!scoreboard->scoreboardInUse.try_lock());
-
+				//thstart = std::chrono::high_resolution_clock::now();
+				while (!scoreboard->scoreboardLock.try_lock());
+				//	thend = std::chrono::high_resolution_clock::now();
+				//	timeForScore += (double)std::chrono::duration_cast<std::chrono::nanoseconds>(thend - thstart).count();
 				if (scoreboard->isFinished) {
-					scoreboard->scoreboardInUse.unlock();
+					scoreboard->scoreboardLock.unlock();
 					break;
 				}
-
+				// set new jobSize
+				scoreboard->jobSize = (jobSize + meanElements) / 2;
 				// get new data
-				if (scoreboard->curIndex + scoreboard->itemsCount < scoreboard->inputSize) {
-					elementsCount = scoreboard->itemsCount;
+				if (scoreboard->curIndex + scoreboard->jobSize < scoreboard->inputSize) {
+					elementsCount = scoreboard->jobSize;
 					elementIndex = scoreboard->curIndex;
-					scoreboard->curIndex += scoreboard->itemsCount;
+					scoreboard->curIndex += scoreboard->jobSize;
 				}
 				else {
 					elementsCount = scoreboard->inputSize - scoreboard->curIndex;
@@ -118,38 +127,23 @@ public:
 					scoreboard->curIndex += elementsCount;
 					scoreboard->isFinished = true;
 				}
-				scoreTime = scoreboard->meanTime;
 				// unlock scoreboard
-				scoreboard->scoreboardInUse.unlock();
-
+				scoreboard->scoreboardLock.unlock();
 
 				// Process the data block
 				// ----------------------
+				wstart = std::chrono::high_resolution_clock::now();
 				for (int elementsFinished = 0; elementsFinished < elementsCount; elementsFinished++) {
-					wstart = std::chrono::high_resolution_clock::now();
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
-					wend = std::chrono::high_resolution_clock::now();
-					workTime = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(wend - wstart).count();
-					//std::cout << workTime << std::endl;
-					if (workTime > scoreTime * 1.50f && workTime < scoreTime * 1.75f ) {
-						// lessen work
-						while (!scoreboard->scoreboardInUse.try_lock());
-						if (scoreboard->itemsCount != (scoreboard->startItems / 2)) {
-							scoreboard->itemsCount = scoreboard->itemsCount / 2;
-					//		std::cout << "Item count: " << scoreboard->itemsCount << std::endl;
-							scoreboard->meanTime = workTime;
-						}
-						scoreboard->scoreboardInUse.unlock();
-					} else if (workTime * 1.50f < scoreTime && workTime * 1.75f > scoreTime) {
-						// increase work
-						while (!scoreboard->scoreboardInUse.try_lock());
-						if ( scoreboard->itemsCount != (scoreboard->startItems * 2)) {
-							scoreboard->itemsCount = scoreboard->itemsCount * 2;
-					//		std::cout << "Item count: " << scoreboard->itemsCount << std::endl;
-							scoreboard->meanTime = workTime;
-						}
-						scoreboard->scoreboardInUse.unlock();
-					}
+				}
+				wend = std::chrono::high_resolution_clock::now();
+				workTime = (double)std::chrono::duration_cast<std::chrono::milliseconds>(wend - wstart).count();
+
+
+				if (workTime > 1.25f || workTime < 0.75f) // more thant 1.25 milisecs work weight has increased
+				{
+					meanTime = workTime / elementsCount;
+					meanElements = 1.00f / meanTime;
 				}
 			}
 
@@ -159,18 +153,16 @@ public:
 		// -----------
 		DynamicMapImplementation(Elemental<EL> elemental) : elemental(elemental) {
 			this->nthreads = std::thread::hardware_concurrency();
-			this->sizeOfWork = 1000;
-			allThreads = new std::thread*[nthreads];
-			this->isInitialised = false;
+			//this->sizeOfWork = 1000;
+		//	allThreads = new std::thread*[nthreads];
+			this->duration = 0.0f;
+			//this->isInitialised = false;
 		}
 
 	public:
 		template <typename IN, typename OUT, typename ...ARGs>
 		void init(std::vector<OUT> *output, std::vector<IN> *input, ARGs... args) {
-			// init scoreboard
-			((Scoreboard<IN, OUT>*)scoreboard)->addWork(input, output);
-			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
-			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
+
 			// create threads
 			for (size_t t = 0; t < nthreads; t++) {
 				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, ((Scoreboard<IN, OUT>*)scoreboard), args...);
@@ -179,30 +171,25 @@ public:
 
 		template <typename IN, typename OUT, typename ...ARGs>
 		void analyse(std::vector<OUT> *output, std::vector<IN> *input, ARGs... args) {
-			std::cout << "ANALYSIS" << std::endl;
-			size_t newWorkSize = 0;
-			while (duration == 0.0f);
-			duration = duration * nthreads;
-			((Scoreboard<IN, OUT>*)scoreboard)->meanTime = duration;
-			while (duration > 0.0f) {
 
+			size_t newJobSize = 0;
+			duration = 10000000.0f / nthreads;
+			double durationAtStart = duration;
+			// analyse worksize
+			while (duration > 0.0f && newJobSize < input->size()) {
 				tstart = std::chrono::high_resolution_clock::now();
-				output->at(newWorkSize) = elemental.elemental(input->at(newWorkSize), args...);
+				output->at(newJobSize) = elemental.elemental(input->at(newJobSize), args...);
 				tend = std::chrono::high_resolution_clock::now();
-				std::cout << "Item Time: " << (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count() << "\n";
 				duration -= (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
-				newWorkSize++;
+				newJobSize++;
 			}
-			sizeOfWork = newWorkSize;
+			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = newJobSize;
+			newJobSize *= nthreads;
 
-			// send work size
+				// send work size
+			((Scoreboard<IN, OUT>*)scoreboard)->jobSize = newJobSize;
+			((Scoreboard<IN, OUT>*)scoreboard)->isInitialised = true;
 
-			((Scoreboard<IN, OUT>*)scoreboard)->meanTime /= sizeOfWork;
-			if (sizeOfWork % 2 == 1)sizeOfWork--;
-			((Scoreboard<IN, OUT>*)scoreboard)->startItems = sizeOfWork;
-			std::cout << "Mean Time: " << ((Scoreboard<IN, OUT>*)scoreboard)->meanTime << "\n";
-			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
-			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
 		}
 
 
@@ -210,51 +197,34 @@ public:
 		// -----------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
-			if (!isInitialised) {
-				scoreboard = new Scoreboard<IN, OUT>();
-				sizeOfWork = 0;
-				duration = 0.0f;
+			this->allThreads = new std::thread*[nthreads];
+			scoreboard = new Scoreboard<IN, OUT>(&input, &output, nthreads);
 
-				// USE THREADER
-				// -----------------------------------------------------------------------------
-				// start threader
-				std::thread *threader;
-				tstart = std::chrono::high_resolution_clock::now();
-				threader = new std::thread(&DynamicMapImplementation<EL>::init<IN, OUT, ARGs...>, this, &output, &input, args...);
-				tend = std::chrono::high_resolution_clock::now();
-				duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
-				// main thread analyses
-				analyse(&output, &input, args...);
+			//std::cout << "THREADER INIT\n";
+			// USE THREADER
+			// -----------------------------------------------------------------------------------
+			// start threader
+			std::thread *threader;
+			threader = new std::thread(&DynamicMapImplementation<EL>::start_init<IN, OUT, ARGs...>, this, &output, &input, args...);
+			// main thread analyses
+			//std::cout << "MAIN THREAD ANALYSIS\n";
+			start_analysis(&output, &input, args...);
 
 
-				// delete threader
-				threader->join();
-				delete threader;
+			// delete threader
+			threader->join();
+			delete threader;
 
-
-				// USE ANALYSER
-				// -----------------------------------------------------------------------------
-				// start analyser
-				//std::thread *analyser;
-				//tstart = std::chrono::high_resolution_clock::now();
-				////analyser = new std::thread(&DynamicMapImplementation<EL>::analyse<IN,OUT,ARGs...>, this, &output, &input, args...);
-				//analyse(&output, &input, args...);
-				//tend = std::chrono::high_resolution_clock::now();
-				//duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
-
-				// main thread initialises threads
-				//init(output, input, args...);
-
-				//analyser->join();
-				//delete analyser;
-
-				isInitialised = true;
-			}
 
 			// Join threads
-			// ------------
+			// -----------------------------------------------------------------------------------
 			for (size_t t = 0; t < nthreads; ++t) {
-				allThreads[t]->join(); delete allThreads[t];
+				allThreads[t]->join();
+				//	std::cout << "THREAD ID:  " << t << "\n";
+				//	std::cout << "SCORE TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->scoretiming->at(t) / 1000.0f / 1000.0f << "\n";
+				//	std::cout << "INIT  TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->inittiming->at(t) << "\n";
+
+				delete allThreads[t];
 			}
 			delete allThreads;
 			delete ((Scoreboard<IN, OUT>*)scoreboard);

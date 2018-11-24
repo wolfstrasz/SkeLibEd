@@ -83,12 +83,13 @@ public:
 		// --------------------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void threadMap(Scoreboard<IN, OUT> *scoreboard, size_t id, ARGs... args) {
-			//	std::chrono::high_resolution_clock::time_point thstart;
-			//	std::chrono::high_resolution_clock::time_point thend;
-			size_t elementsCount;
-			size_t elementIndex;
+			//std::chrono::high_resolution_clock::time_point thstart;
+			//std::chrono::high_resolution_clock::time_point thend;
 			//double timeForScore = 0.0f;
 			//size_t jobsDone = 0;
+			size_t elementsCount;
+			size_t elementIndex;
+			
 			while (!scoreboard->isInitialised);
 
 
