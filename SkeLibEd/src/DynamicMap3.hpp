@@ -130,7 +130,7 @@ public:
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
 				}
 			}
-			scoreboard->scoretiming->at(id) = timeForScore*10;
+			scoreboard->scoretiming->at(id) = timeForScore/1000.0f;
 		//	scoreboard->inittiming->at(id) = timeForInit;
 			//std::cout << "Time for init : " << timeForInit << "\n";
 			//std::cout << "Time for score : " << timeForScore << "\n";
