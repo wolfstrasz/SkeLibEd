@@ -123,17 +123,17 @@ namespace nbody {
 		// particle vectors initialization
 		nbody_init(particles, indices, np);
 
-		std::cout<<" SIZES " << np << " : " << iterations << std::endl;
+		// std::cout<<" SIZES " << np << " : " << iterations << std::endl;
 
 		for (size_t i = 0; i < iterations; i += 2) {
-			std::cout << " ITER " << i << std::endl;
+		//	std::cout << " ITER " << i << std::endl;
 
 			nbody_simulate_step(doublebuffer, indices, particles);
-			std::cout << " ITER " << i+1 << std::endl;
+		//	std::cout << " ITER " << i+1 << std::endl;
 
 			nbody_simulate_step(particles, indices, doublebuffer);
 		}
-		std::cout << " SIZES " << np << " : " << iterations << std::endl;
+	//	std::cout << " SIZES " << np << " : " << iterations << std::endl;
 
 	}
 	// Function of Dynamic map
@@ -186,6 +186,7 @@ namespace nbody {
 
 		// test static map
 		// -------------------------------------------
+		std::cout << "SMAP TEST\n";
 		auto start = std::chrono::system_clock::now();
 		snbody(sParticles);
 		auto end = std::chrono::system_clock::now();
@@ -194,6 +195,7 @@ namespace nbody {
 
 		// test dynamic map
 		// ----------------------------------------------
+		std::cout << "DMAP TEST\n";
 		start = std::chrono::system_clock::now();
 		dnbody(sParticles);
 		end = std::chrono::system_clock::now();
