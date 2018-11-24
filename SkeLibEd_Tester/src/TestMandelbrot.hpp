@@ -29,7 +29,7 @@ namespace mandelbrot {
 		}
 	};
 
-	pixel_t mandelbrot_elemental(size_t taskid, double magnification, size_t xres, size_t yres, size_t itermax, size_t blocksize = 0) {
+	pixel_t mandelbrot_elemental(size_t taskid, double magnification, size_t xres, size_t yres, size_t itermax/*, size_t blocksize = 0*/) {
 
 		pixel_t pixel;
 		double x, xx, y, cx, cy;
