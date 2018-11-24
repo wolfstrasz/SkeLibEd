@@ -67,7 +67,12 @@ public:
 			void switchWorkload(size_t newMeanWork) {
 				std::cout << "NEW WORK FROM: " << jobSize;
 				jobSize = (jobSize + newMeanWork) / 2;
+				jobSize = jobSize == 0 ? 1 : jobSize;
 				std::cout << "\tTO: " << jobSize << "\n";
+			}
+			void printWork(size_t id, double workTime) {
+				std::cout << "THREAD: " << id << "\t WORKTIME: " << workTime << std::endl;
+
 			}
 			// timing
 			//std::vector<double>* scoretiming;
@@ -145,7 +150,7 @@ public:
 				}
 				wend = std::chrono::high_resolution_clock::now();
 				workTime += (double)std::chrono::duration_cast<std::chrono::milliseconds>(wend - wstart).count();
-				std::cout << "THREAD: " << id << "\t WORKTIME: " << workTime << std::endl;
+				scoreboard->printWork(id, workTime);
 
 				if (workTime > 1.25f || workTime < 0.75f) // more thant 1.25 milisecs work weight has increased
 				{
