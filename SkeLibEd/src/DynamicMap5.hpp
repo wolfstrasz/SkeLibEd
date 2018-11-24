@@ -88,7 +88,7 @@ public:
 			size_t elementsCount;
 			size_t elementIndex;
 			double timeForScore = 0.0f;
-
+			size_t jobsDone = 0;
 			while (!scoreboard->isInitialised);
 
 
@@ -125,8 +125,9 @@ public:
 					//	std::cout << "ACCESS OUT OF RANGE AT THREAD: " << id << "\n";
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
 				}
+				jobsDone++;
 			}
-				scoreboard->scoretiming->at(id) = timeForScore;
+				scoreboard->scoretiming->at(id) = timeForScore / jobsDone;
 				//std::cout << "Time for score : " << timeForScore << "\n";
 
 		}
@@ -234,7 +235,7 @@ public:
 			for (size_t t = 0; t < nthreads; ++t) {
 				allThreads[t]->join();
 				//	std::cout << "THREAD ID:  " << t << "\n";
-			//	std::cout << "SCORE TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->scoretiming->at(t) / 1000.0f / 1000.0f << "\n";
+				std::cout << "SCORE TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->scoretiming->at(t) / 1000.0f / 1000.0f << "\n";
 				//	std::cout << "INIT  TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->inittiming->at(t) << "\n";
 
 				delete allThreads[t];
