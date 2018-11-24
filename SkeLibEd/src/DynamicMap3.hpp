@@ -169,7 +169,7 @@ public:
 			this->allThreads = new std::thread*[nthreads];
 			scoreboard = new Scoreboard<IN, OUT>(&input, &output);
 			
-			std::cout << "THREADER INIT\n";
+			//std::cout << "THREADER INIT\n";
 			// USE THREADER
 			// -----------------------------------------------------------------------------------
 			// start threader
@@ -179,14 +179,14 @@ public:
 			tend = std::chrono::high_resolution_clock::now();
 			duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 			// main thread analyses
-			std::cout << "MAIN THREAD ANALYSIS\n";
+		//	std::cout << "MAIN THREAD ANALYSIS\n";
 			start_analysis(&output, &input, args...);
 
 
 			// delete threader
 			threader->join();
 			delete threader;
-			std::cout << "THREADER DELETED\n";
+		//	std::cout << "THREADER DELETED\n";
 
 			// USE ANALYSER
 			// -----------------------------------------------------------------------------------
