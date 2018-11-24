@@ -61,9 +61,9 @@ public:
 			std::mutex scoreboardLock;
 
 			// analysis
-			double meanTime;
+			//double meanTime;
 			size_t startItems;
-			int counter = 0;
+			int counter;
 			void switchWorkload(size_t newMeanWork) {
 				if (this->counter < 10) {
 					std::cout << "NEW WORK " << counter << " FROM: " << jobSize;
@@ -90,7 +90,8 @@ public:
 				inputSize = in->size();
 				curIndex = 0;
 				jobSize = 0;
-				meanTime = 1000 * 1000; // 1milisec
+				//meanTime = 1000 * 1000; // 1milisec
+				counter = 0;
 				//scoretiming = new std::vector<double>(nthreads);
 			}
 			~Scoreboard() {}
@@ -155,13 +156,13 @@ public:
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
 				}
 				wend = std::chrono::high_resolution_clock::now();
-				workTime += (double)std::chrono::duration_cast<std::chrono::milliseconds>(wend - wstart).count();
+				workTime += (double)std::chrono::duration_cast<std::chrono::nanoseconds>(wend - wstart).count();
 
-				if (workTime > 1.25f || workTime < 0.75f) // more thant 1.25 milisecs work weight has increased
-				{
-					meanTime = workTime / elementsCount;
-					meanElements = 1.00f / meanTime;
-				}
+				//if (workTime > 1.25f || workTime < 0.75f) // more thant 1.25 milisecs work weight has increased
+				//{
+				//	meanTime = workTime / elementsCount;
+				//	meanElements = 1.00f / meanTime;
+				//}
 			}
 
 		}
