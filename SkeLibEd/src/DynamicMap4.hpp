@@ -91,7 +91,7 @@ public:
 		// ThreadMap - function applied to each thread
 		// --------------------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
-		void threadMap(Scoreboard<IN, OUT> *scoreboard, ARGs... args) {
+		void threadMap(Scoreboard<IN, OUT> *scoreboard,size_t id, ARGs... args) {
 			//std::chrono::high_resolution_clock::time_point thstart;
 			//std::chrono::high_resolution_clock::time_point thend;
 			//double timeForScore = 0.0f;
@@ -145,7 +145,7 @@ public:
 				}
 				wend = std::chrono::high_resolution_clock::now();
 				workTime = (double)std::chrono::duration_cast<std::chrono::milliseconds>(wend - wstart).count();
-
+				std::cout << "THREAD: " << id << "\t WORKTIME: " << workTime << std::endl;
 
 				if (workTime > 1.25f || workTime < 0.75f) // more thant 1.25 milisecs work weight has increased
 				{
@@ -172,7 +172,7 @@ public:
 
 			// create threads
 			for (size_t t = 0; t < nthreads; t++) {
-				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, ((Scoreboard<IN, OUT>*)scoreboard), args...);
+				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, ((Scoreboard<IN, OUT>*)scoreboard),t, args...);
 			}
 		}
 
