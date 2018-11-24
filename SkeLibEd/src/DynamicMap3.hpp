@@ -127,6 +127,8 @@ public:
 				// Process the data block
 				// ----------------------
 				for (int elementsFinished = 0; elementsFinished < elementsCount; elementsFinished++) {
+					if (elementIndex + elementsFinished >= scoreboard->inputSize)
+						std::cout << "ACCESS OUT OF RANGE AT THREAD: " << id << "\n";
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
 				}
 			}
