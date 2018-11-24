@@ -75,8 +75,9 @@ public:
 			//	std::getchar();
 			}
 			void printWork(size_t id, double workTime) {
-				std::cout << "THREAD: " << id << "\t WORKTIME: " << workTime << std::endl;
-
+				if (this->counter < 10) {
+					std::cout << "THREAD: " << id << "\t WORKTIME: " << workTime << std::endl;
+				}
 			}
 			// timing
 			//std::vector<double>* scoretiming;
