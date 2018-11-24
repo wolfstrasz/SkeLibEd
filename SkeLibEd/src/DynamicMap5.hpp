@@ -168,10 +168,10 @@ public:
 				duration -= (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 				newJobSize++;
 			}
-			std::cout << "JOBSIZE: " << newJobSize << "\n";
-			std::cout << "TIME:  " << durationAtStart << "\n";
-			std::cout << "MICRO: " << durationAtStart / 1000.0f << "\n";
-			std::cout << "MILLI: " << durationAtStart / 1000.0f / 1000.0f << "\n";
+		//	std::cout << "JOBSIZE: " << newJobSize << "\n";
+		//	std::cout << "TIME:  " << durationAtStart << "\n";
+		//	std::cout << "MICRO: " << durationAtStart / 1000.0f << "\n";
+		//	std::cout << "MILLI: " << durationAtStart / 1000.0f / 1000.0f << "\n";
 			//sizeOfWork = newJobSize;
 			//factor = duration / (1000.0f 1000.0f); //micro
 			//duration = duration / 1000.0f // milli
@@ -234,7 +234,7 @@ public:
 			for (size_t t = 0; t < nthreads; ++t) {
 				allThreads[t]->join();
 				//	std::cout << "THREAD ID:  " << t << "\n";
-				std::cout << "SCORE TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->scoretiming->at(t) / 1000.0f / 1000.0f << "\n";
+			//	std::cout << "SCORE TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->scoretiming->at(t) / 1000.0f / 1000.0f << "\n";
 				//	std::cout << "INIT  TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->inittiming->at(t) << "\n";
 
 				delete allThreads[t];
