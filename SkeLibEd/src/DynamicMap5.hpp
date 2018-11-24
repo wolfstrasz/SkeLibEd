@@ -158,6 +158,7 @@ public:
 			while (duration == 0.0f);			// guard if we are using analyser
 			//duration = duration * nthreads;
 			//duration = 1000000.0f; // 1milisec
+			duration = 10000000.0f / nthreads;
 			double durationAtStart = duration;
 			// analyse worksize
 			while (duration > 0.0f && newJobSize < input->size()) {
@@ -172,7 +173,8 @@ public:
 			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = newJobSize;
 			//if (newJobSize == input->size())((Scoreboard<IN, OUT>*)scoreboard)->isFinished = true;
 
-			newJobSize *= (int)(1000000.0f / durationAtStart);
+			//newJobSize *= (int)(1000000.0f / durationAtStart);
+			newJobSize *= nthreads;
 		//	std::cout << "JOBSIZE: " << newJobSize << "\n";
 		//	std::cout << "TIME:  " << durationAtStart << "\n";
 		//	std::cout << "MICRO: " << durationAtStart / 1000.0f << "\n";
@@ -237,7 +239,7 @@ public:
 			for (size_t t = 0; t < nthreads; ++t) {
 				allThreads[t]->join();
 				//	std::cout << "THREAD ID:  " << t << "\n";
-				std::cout << "SCORE TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->scoretiming->at(t) / 1000.0f / 1000.0f << "\n";
+			//	std::cout << "SCORE TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->scoretiming->at(t) / 1000.0f / 1000.0f << "\n";
 				//	std::cout << "INIT  TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->inittiming->at(t) << "\n";
 
 				delete allThreads[t];
