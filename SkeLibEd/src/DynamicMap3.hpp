@@ -103,7 +103,7 @@ public:
 				thstart = std::chrono::high_resolution_clock::now();
 				while (!scoreboard->scoreboardLock.try_lock());
 				thend = std::chrono::high_resolution_clock::now();
-				timeForScore += (double)std::chrono::duration_cast<std::chrono::nanoseconds>(thend - thstart).count();
+				timeForScore += (double)std::chrono::duration_cast<std::chrono::milliseconds>(thend - thstart).count();
 				if (scoreboard->isFinished) {
 					scoreboard->scoreboardLock.unlock();
 					break;
