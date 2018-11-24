@@ -62,8 +62,7 @@ public:
 			std::mutex scoreboardLock;
 
 			// timing
-		//	std::vector<double>* scoretiming;
-		//	std::vector<double>* inittiming;
+			std::vector<double>* scoretiming;
 			// constructor
 			Scoreboard(std::vector<IN> *in, std::vector<OUT> *out, size_t nthreads) {
 				this->input = in;
@@ -73,8 +72,7 @@ public:
 				inputSize = in->size();
 				curIndex = 0;
 				jobSize = 0;
-				//	scoretiming = new std::vector<double>(nthreads);
-				//	inittiming = new std::vector<double>(nthreads);
+					scoretiming = new std::vector<double>(nthreads);
 			}
 			~Scoreboard() {}
 		};
@@ -85,25 +83,21 @@ public:
 		// --------------------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void threadMap(Scoreboard<IN, OUT> *scoreboard, size_t id, ARGs... args) {
-			//	std::chrono::high_resolution_clock::time_point thstart;
-			//	std::chrono::high_resolution_clock::time_point thend;
+				std::chrono::high_resolution_clock::time_point thstart;
+				std::chrono::high_resolution_clock::time_point thend;
 			size_t elementsCount;
 			size_t elementIndex;
-			//		double timeForInit = 0.0f;
-				//	double timeForScore = 0.0f;
+			double timeForScore = 0.0f;
 
-				//	thstart = std::chrono::high_resolution_clock::now();
 			while (!scoreboard->isInitialised);
-			//	thend = std::chrono::high_resolution_clock::now();
-			//	timeForInit = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(thend - thstart).count();
 
 
 			while (!scoreboard->isFinished) {
 				// Lock scoreboard
-			//	thstart = std::chrono::high_resolution_clock::now();
+				thstart = std::chrono::high_resolution_clock::now();
 				while (!scoreboard->scoreboardLock.try_lock());
-				//	thend = std::chrono::high_resolution_clock::now();
-				//	timeForScore += (double)std::chrono::duration_cast<std::chrono::nanoseconds>(thend - thstart).count();
+					thend = std::chrono::high_resolution_clock::now();
+					timeForScore += (double)std::chrono::duration_cast<std::chrono::nanoseconds>(thend - thstart).count();
 				if (scoreboard->isFinished) {
 					scoreboard->scoreboardLock.unlock();
 					break;
@@ -132,9 +126,7 @@ public:
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
 				}
 			}
-			//	scoreboard->scoretiming->at(id) = timeForScore/1000.0f;
-			//	scoreboard->inittiming->at(id) = timeForInit;
-				//std::cout << "Time for init : " << timeForInit << "\n";
+				scoreboard->scoretiming->at(id) = timeForScore;
 				//std::cout << "Time for score : " << timeForScore << "\n";
 
 		}
@@ -178,7 +170,7 @@ public:
 			std::cout << "JOBSIZE: " << newJobSize << "\n";
 			std::cout << "TIME:  " << durationAtStart << "\n";
 			std::cout << "MICRO: " << durationAtStart / 1000.0f << "\n";
-			std::cout << "MILLI: " << durationAtStart / 1000.0f / 1000.0f << "\n";
+			std::cout << "MILLI: " << duration / 1000.0f / 1000.0f << "\n";
 			//sizeOfWork = newJobSize;
 			//factor = duration / (1000.0f 1000.0f); //micro
 			//duration = duration / 1000.0f // milli
@@ -241,7 +233,7 @@ public:
 			for (size_t t = 0; t < nthreads; ++t) {
 				allThreads[t]->join();
 				//	std::cout << "THREAD ID:  " << t << "\n";
-				//	std::cout << "SCORE TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->scoretiming->at(t) << "\n";
+				std::cout << "SCORE TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->scoretiming->at(t) / 1000.0f << "\n";
 				//	std::cout << "INIT  TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->inittiming->at(t) << "\n";
 
 				delete allThreads[t];
