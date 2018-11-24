@@ -138,8 +138,8 @@ namespace nbody {
 
 		std::vector<size_t> indices(particles.size());
 
-		auto nbody_init = DynamicMap(init, threads, np / (blocks * threads));
-		auto nbody_simulate_step = DynamicMap(move, threads, np / (blocks * threads));
+		auto nbody_init = DynamicMap(init/*, threads , np / (blocks * threads)*/);
+		auto nbody_simulate_step = DynamicMap(move/*, threads, np / (blocks * threads)*/);
 
 		// initialization of indices vector
 		for (size_t i = 0; i < particles.size(); i++) {

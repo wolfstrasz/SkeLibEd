@@ -49,14 +49,14 @@ namespace mandelbrot {
 		}
 
 		if (iteration <= itermax) {
-			pixel.r = 0; pixel.g = 0; pixel.b = 0;
+			pixel.r = 0; pixel.g = 150; pixel.b = 150;
 		}
 		else {
 			pixel.r = 255; pixel.g = 0; pixel.b = 0;
 		}
- 		pixel.g = ((((double)colortint) / itermax) * 255) ;// (colortint % (255/32) )* 32;
-		if (taskid % (blocksize*2) < blocksize) pixel.b = 0;
-		else pixel.b = 255;
+ 	//	pixel.g = ((((double)colortint) / itermax) * 255) ;// (colortint % (255/32) )* 32;
+	//	if (taskid % (blocksize*2) < blocksize) pixel.b = 0;
+	//	else pixel.b = 255;
 
 		return pixel;
 	}
@@ -109,8 +109,8 @@ namespace mandelbrot {
 
 			auto start = std::chrono::system_clock::now();
 
-			auto dynamicMap = DynamicMap(mandelbrot_elemental, threadcount, itemcount / (blockcount * threadcount));
-			dynamicMap(dynMapOut, in, arg, ixc, iyc, itermax, itemcount / (blockcount * threadcount));
+			auto dynamicMap = DynamicMap(mandelbrot_elemental /*, threadcount, itemcount / (blockcount * threadcount)*/);
+			dynamicMap(dynMapOut, in, arg, ixc, iyc, itermax /*, itemcount / (blockcount * threadcount)*/);
 
 			auto end = std::chrono::system_clock::now();
 			time += (end - start);
