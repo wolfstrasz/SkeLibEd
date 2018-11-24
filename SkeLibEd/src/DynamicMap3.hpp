@@ -228,7 +228,11 @@ public:
 			// Join threads
 			// -----------------------------------------------------------------------------------
 			for (size_t t = 0; t < nthreads; ++t) {
-				allThreads[t]->join(); 
+				allThreads[t]->join();
+				std::cout << "THREAD ID:  " << t << "\n";
+				std::cout << "SCORE TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->scoretiming->at(t) << "\n";
+				std::cout << "SCORE TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->inittiming->at(t) << "\n";
+
 				delete allThreads[t]; 
 			}
 			delete allThreads;
