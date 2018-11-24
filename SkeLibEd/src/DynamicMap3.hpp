@@ -168,6 +168,8 @@ public:
 			// analyse worksize
 			while (duration > 0.0f) {
 				tstart = std::chrono::high_resolution_clock::now();
+				if (newJobSize >= input->size())
+					std::cout << "ACCESS OUT OF RANGE AT THREAD: MAIN: " << newJobSize << "\n";
 				output->at(newJobSize) = elemental.elemental(input->at(newJobSize), args...);
 				tend = std::chrono::high_resolution_clock::now();
 				duration -= (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
