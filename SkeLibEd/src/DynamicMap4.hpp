@@ -144,7 +144,7 @@ public:
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
 				}
 				wend = std::chrono::high_resolution_clock::now();
-				workTime = (double)std::chrono::duration_cast<std::chrono::milliseconds>(wend - wstart).count();
+				workTime += (double)std::chrono::duration_cast<std::chrono::milliseconds>(wend - wstart).count();
 				std::cout << "THREAD: " << id << "\t WORKTIME: " << workTime << std::endl;
 
 				if (workTime > 1.25f || workTime < 0.75f) // more thant 1.25 milisecs work weight has increased
