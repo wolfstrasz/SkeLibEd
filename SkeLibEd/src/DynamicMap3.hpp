@@ -63,7 +63,7 @@ public:
 
 			// timing
 			std::vector<double>* scoretiming;
-			std::vector<double>* inittiming;
+		//	std::vector<double>* inittiming;
 			// constructor
 			Scoreboard(std::vector<IN> *in, std::vector<OUT> *out, size_t nthreads) {
 				this->input = in;
@@ -74,7 +74,7 @@ public:
 				curIndex = 0;
 				jobSize = 0;
 				scoretiming = new std::vector<double>(nthreads);
-				inittiming = new std::vector<double>(nthreads);
+			//	inittiming = new std::vector<double>(nthreads);
 			}
 			~Scoreboard() {}
 		};
@@ -89,13 +89,13 @@ public:
 			std::chrono::high_resolution_clock::time_point thend;
 			size_t elementsCount;
 			size_t elementIndex;
-			double timeForInit = 0.0f;
+	//		double timeForInit = 0.0f;
 			double timeForScore = 0.0f;
 
-			thstart = std::chrono::high_resolution_clock::now();
+		//	thstart = std::chrono::high_resolution_clock::now();
 			while (!scoreboard->isInitialised);
-			thend = std::chrono::high_resolution_clock::now();
-			timeForInit = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(thend - thstart).count();
+		//	thend = std::chrono::high_resolution_clock::now();
+		//	timeForInit = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(thend - thstart).count();
 
 
 			while (!scoreboard->isFinished) {
@@ -131,7 +131,7 @@ public:
 				}
 			}
 			scoreboard->scoretiming->at(id) = timeForScore;
-			scoreboard->inittiming->at(id) = timeForInit;
+		//	scoreboard->inittiming->at(id) = timeForInit;
 			//std::cout << "Time for init : " << timeForInit << "\n";
 			//std::cout << "Time for score : " << timeForScore << "\n";
 
@@ -231,7 +231,7 @@ public:
 				allThreads[t]->join();
 				std::cout << "THREAD ID:  " << t << "\n";
 				std::cout << "SCORE TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->scoretiming->at(t) << "\n";
-				std::cout << "SCORE TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->inittiming->at(t) << "\n";
+			//	std::cout << "INIT  TIME: " << ((Scoreboard<IN, OUT>*)scoreboard)->inittiming->at(t) << "\n";
 
 				delete allThreads[t]; 
 			}
