@@ -106,7 +106,7 @@ public:
 			std::chrono::high_resolution_clock::time_point wstart;
 			std::chrono::high_resolution_clock::time_point wend;
 			double workTime = 0.0f;
-			double meanTime = 0.0fs;
+			double meanTime = 0.0f;
 			size_t meanElements;
 			size_t elementsCount;
 			size_t elementIndex;
