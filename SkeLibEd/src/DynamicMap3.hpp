@@ -179,7 +179,7 @@ public:
 
 			// send work size
 			while (!((Scoreboard<IN, OUT>*)scoreboard)->scoreboardLock.try_lock());
-			if (newJobSize = input->size())((Scoreboard<IN, OUT>*)scoreboard)->isFinished = true;
+			//if (newJobSize = input->size())((Scoreboard<IN, OUT>*)scoreboard)->isFinished = true;
 			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = newJobSize;
 			((Scoreboard<IN, OUT>*)scoreboard)->jobSize = newJobSize;
 			((Scoreboard<IN, OUT>*)scoreboard)->isInitialised = true;
