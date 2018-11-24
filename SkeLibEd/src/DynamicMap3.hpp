@@ -61,6 +61,9 @@ public:
 			// guard
 			std::mutex scoreboardLock;
 
+			// timing
+			std::vector<double> scoretiming;
+			std::vector<double> inittiming;
 			// constructor
 			Scoreboard(std::vector<IN> *in, std::vector<OUT> *out) {
 				this->input = in;
@@ -70,6 +73,8 @@ public:
 				inputSize = in->size();
 				curIndex = 0;
 				jobSize = 0;
+				scoretiming = new std::vector<double>(nthreads);
+				inittiming = new std::vector<double>(nthreads);
 			}
 			~Scoreboard() {}
 		};
@@ -79,7 +84,7 @@ public:
 		// ThreadMap - function applied to each thread
 		// --------------------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
-		void threadMap(Scoreboard<IN, OUT> *scoreboard, ARGs... args) {
+		void threadMap(Scoreboard<IN, OUT> *scoreboard,size_t id, ARGs... args) {
 			std::chrono::high_resolution_clock::time_point thstart;
 			std::chrono::high_resolution_clock::time_point thend;
 			size_t elementsCount;
@@ -125,8 +130,10 @@ public:
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
 				}
 			}
-			std::cout << "Time for init : " << timeForInit << "\n";
-			std::cout << "Time for score : " << timeForScore << "\n";
+			scoreboard->scoretiming[id] = timeForScore;
+			scoreboard->inittiming[id] = timeForInit;
+			//std::cout << "Time for init : " << timeForInit << "\n";
+			//std::cout << "Time for score : " << timeForScore << "\n";
 
 		}
 
@@ -145,7 +152,7 @@ public:
 			// create threads
 			for (size_t t = 0; t < nthreads; t++) {
 				allThreads[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>,
-					this, ((Scoreboard<IN, OUT>*)scoreboard), args...);
+					this, ((Scoreboard<IN, OUT>*)scoreboard),t, args...);
 			}
 		}
 
