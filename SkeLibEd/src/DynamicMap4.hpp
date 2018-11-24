@@ -63,6 +63,12 @@ public:
 			// analysis
 			double meanTime;
 			size_t startItems;
+
+			void switchWorkload(size_t newMeanWork) {
+				std::cout << "NEW WORK FROM: " << jobSize;
+				jobSize = (jobSize + newMeanWork) / 2;
+				std::cout << "\tTO: " << jobSize << "\n";
+			}
 			// timing
 			//std::vector<double>* scoretiming;
 			// constructor
@@ -114,7 +120,8 @@ public:
 					break;
 				}
 				// set new jobSize
-				scoreboard->jobSize = (scoreboard->jobSize + meanElements) / 2;
+				scoreboard->switchWorkload(meanElements);
+				//scoreboard->jobSize = (scoreboard->jobSize + meanElements) / 2;
 				// get new data
 				if (scoreboard->curIndex + scoreboard->jobSize < scoreboard->inputSize) {
 					elementsCount = scoreboard->jobSize;
