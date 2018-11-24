@@ -164,7 +164,7 @@ public:
 			size_t newJobSize = 0;
 			while (duration == 0.0f);			// guard if we are using analyser
 			duration = duration * nthreads;
-
+			double durationAtStart = duration;
 			// analyse worksize
 			while (duration > 0.0f && newJobSize < input->size()) {
 				tstart = std::chrono::high_resolution_clock::now();
@@ -176,9 +176,9 @@ public:
 				newJobSize++;
 			}
 			std::cout << "JOBSIZE: " << newJobSize << "\n";
-			std::cout << "TIME:  " << duration << "\n";
-			std::cout << "MICRO: " << duration / 1000.0f << "\n";
-			std::cout << "MILLI: " << duration / 1000.0f / 1000.0f << "\n";
+			std::cout << "TIME:  " << durationAtStart << "\n";
+			std::cout << "MICRO: " << durationAtStart / 1000.0f << "\n";
+			std::cout << "MILLI: " << durationAtStart / 1000.0f / 1000.0f << "\n";
 			//sizeOfWork = newJobSize;
 			//factor = duration / (1000.0f 1000.0f); //micro
 			//duration = duration / 1000.0f // milli
