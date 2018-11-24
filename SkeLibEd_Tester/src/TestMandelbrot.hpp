@@ -92,7 +92,7 @@ namespace mandelbrot {
 			auto start = std::chrono::system_clock::now();
 
 			auto map = Map(mandelbrot_elemental, threadcount, blockcount);
-			map(mapOut, in, arg, ixc, iyc, itermax, itemcount / (blockcount * threadcount));
+			map(mapOut, in, arg, ixc, iyc, itermax/*, itemcount / (blockcount * threadcount)*/);
 
 			auto end = std::chrono::system_clock::now();
 			time += (end - start);
