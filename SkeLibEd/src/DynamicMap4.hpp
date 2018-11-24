@@ -64,7 +64,8 @@ public:
 			//double meanTime;
 			size_t startItems;
 			void switchWorkload(size_t newMeanWork, double workTime) {
-				std::cout << "SWITCH FROM: " << jobSize << "\t TO: "<< newMeanWork << "\t CUZ: " << workTime;
+				std::cout << "SWITCH FROM: " << jobSize << "\t TO: "<< newMeanWork 
+					<< "\t CUZ: " << workTime <<"\t" << workTime/1000 << "\t" << workTime / 1000 / 1000 << "\n";
 					this->jobSize = (this->jobSize + newMeanWork) / 2;
 					this->jobSize = this->jobSize == 0 ? 1 : jobSize;
 			}
@@ -145,13 +146,13 @@ public:
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
 				}
 				wend = std::chrono::high_resolution_clock::now();
-				workTime += (double)std::chrono::duration_cast<std::chrono::milliseconds>(wend - wstart).count();
-
-				if (workTime > 1.25f || workTime < 0.75f) // more thant 1.25 milisecs work weight has increased
-				{
-					meanTime = workTime / elementsCount;
-					meanElements = 1.00f / meanTime;
-				}
+				workTime = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(wend - wstart).count();
+				
+				//if (workTime > 1.25f || workTime < 0.75f) // more thant 1.25 milisecs work weight has increased
+				//{
+				//	meanTime = workTime / elementsCount;
+				//	meanElements = 1.00f / meanTime;
+				//}
 			}
 
 		}
