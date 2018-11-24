@@ -63,13 +63,16 @@ public:
 			// analysis
 			double meanTime;
 			size_t startItems;
-
+			int counter = 0;
 			void switchWorkload(size_t newMeanWork) {
-				std::cout << "NEW WORK FROM: " << jobSize;
-				jobSize = (jobSize + newMeanWork) / 2;
-				jobSize = jobSize == 0 ? 1 : jobSize;
-				std::cout << "\tTO: " << jobSize << "\n";
-				std::getchar();
+				if (counter < 10) {
+					std::cout << "NEW WORK FROM: " << jobSize;
+					jobSize = (jobSize + newMeanWork) / 2;
+					jobSize = jobSize == 0 ? 1 : jobSize;
+					std::cout << "\tTO: " << jobSize << "\n";
+					counter++;
+				}
+			//	std::getchar();
 			}
 			void printWork(size_t id, double workTime) {
 				std::cout << "THREAD: " << id << "\t WORKTIME: " << workTime << std::endl;
