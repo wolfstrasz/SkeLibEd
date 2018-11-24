@@ -62,8 +62,8 @@ public:
 			std::mutex scoreboardLock;
 
 			// timing
-			std::vector<double> scoretiming;
-			std::vector<double> inittiming;
+			std::vector<double>* scoretiming;
+			std::vector<double>* inittiming;
 			// constructor
 			Scoreboard(std::vector<IN> *in, std::vector<OUT> *out, size_t nthreads) {
 				this->input = in;
@@ -130,8 +130,8 @@ public:
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
 				}
 			}
-			scoreboard->scoretiming[id] = timeForScore;
-			scoreboard->inittiming[id] = timeForInit;
+			scoreboard->scoretiming->at(id) = timeForScore;
+			scoreboard->inittiming->at(id) = timeForInit;
 			//std::cout << "Time for init : " << timeForInit << "\n";
 			//std::cout << "Time for score : " << timeForScore << "\n";
 
