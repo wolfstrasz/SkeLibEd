@@ -114,7 +114,7 @@ public:
 					break;
 				}
 				// set new jobSize
-				scoreboard->jobSize = (jobSize + meanElements) / 2;
+				scoreboard->jobSize = (scoreboard->jobSize + meanElements) / 2;
 				// get new data
 				if (scoreboard->curIndex + scoreboard->jobSize < scoreboard->inputSize) {
 					elementsCount = scoreboard->jobSize;
@@ -161,7 +161,7 @@ public:
 
 	public:
 		template <typename IN, typename OUT, typename ...ARGs>
-		void init(std::vector<OUT> *output, std::vector<IN> *input, ARGs... args) {
+		void start_init(std::vector<OUT> *output, std::vector<IN> *input, ARGs... args) {
 
 			// create threads
 			for (size_t t = 0; t < nthreads; t++) {
@@ -170,7 +170,7 @@ public:
 		}
 
 		template <typename IN, typename OUT, typename ...ARGs>
-		void analyse(std::vector<OUT> *output, std::vector<IN> *input, ARGs... args) {
+		void start_analysis(std::vector<OUT> *output, std::vector<IN> *input, ARGs... args) {
 
 			size_t newJobSize = 0;
 			duration = 10000000.0f / nthreads;
