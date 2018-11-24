@@ -103,7 +103,7 @@ public:
 				thstart = std::chrono::high_resolution_clock::now();
 				while (!scoreboard->scoreboardLock.try_lock());
 				thend = std::chrono::high_resolution_clock::now();
-				timeForScore += (double)std::chrono::duration_cast<std::chrono::milliseconds>(thend - thstart).count();
+				timeForScore += (double)std::chrono::duration_cast<std::chrono::nanoseconds>(thend - thstart).count();
 				if (scoreboard->isFinished) {
 					scoreboard->scoreboardLock.unlock();
 					break;
@@ -130,7 +130,7 @@ public:
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
 				}
 			}
-			scoreboard->scoretiming->at(id) = timeForScore;
+			scoreboard->scoretiming->at(id) = timeForScore*10;
 		//	scoreboard->inittiming->at(id) = timeForInit;
 			//std::cout << "Time for init : " << timeForInit << "\n";
 			//std::cout << "Time for score : " << timeForScore << "\n";
