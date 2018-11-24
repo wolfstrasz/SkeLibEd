@@ -123,7 +123,7 @@ public:
 			this->nthreads = std::thread::hardware_concurrency();
 		//	this->sizeOfWork = 0;
 			this->duration = 0.0f;
-			//this->allThreads = new std::thread*[nthreads];
+			this->allThreads = new std::thread*[nthreads];
 		}
 
 	public:
@@ -166,7 +166,7 @@ public:
 		// -----------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
-			this->allThreads = new std::thread*[nthreads];
+			//this->allThreads = new std::thread*[nthreads];
 			scoreboard = new Scoreboard<IN, OUT>(&input, &output);
 			
 			//std::cout << "THREADER INIT\n";
@@ -208,7 +208,7 @@ public:
 			// Join threads
 			// -----------------------------------------------------------------------------------
 			for (size_t t = 0; t < nthreads; ++t) { allThreads[t]->join(); delete allThreads[t]; }
-			delete allThreads;
+			//delete allThreads;
 			delete ((Scoreboard<IN, OUT>*)scoreboard);
 
 		}
