@@ -125,6 +125,7 @@ public:
 					break;
 				}
 				// set new jobSize
+				scoreboard->printWork(id, workTime);
 				scoreboard->switchWorkload(meanElements);
 				//scoreboard->jobSize = (scoreboard->jobSize + meanElements) / 2;
 				// get new data
@@ -150,7 +151,6 @@ public:
 				}
 				wend = std::chrono::high_resolution_clock::now();
 				workTime += (double)std::chrono::duration_cast<std::chrono::milliseconds>(wend - wstart).count();
-				scoreboard->printWork(id, workTime);
 
 				if (workTime > 1.25f || workTime < 0.75f) // more thant 1.25 milisecs work weight has increased
 				{
