@@ -157,6 +157,7 @@ public:
 			while (!((Scoreboard<IN, OUT>*)scoreboard)->scoreboardLock.try_lock());
 			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = newJobSize;
 			((Scoreboard<IN, OUT>*)scoreboard)->jobSize = newJobSize;
+			((Scoreboard<IN, OUT>*)scoreboard)->isInitialised = true;
 			((Scoreboard<IN, OUT>*)scoreboard)->scoreboardLock.unlock();
 		}
 
