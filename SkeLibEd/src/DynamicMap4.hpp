@@ -65,7 +65,7 @@ public:
 			size_t startItems;
 			void switchWorkload(size_t newMeanWork, double workTime) {
 				std::cout << "SWITCH FROM: " << jobSize << "\t TO: "<< newMeanWork 
-					<< "\t CUZ: " << workTime <<"\t" << workTime/1000 << "\t" << workTime / 1000 / 1000 << "\n";
+					<< "\t CUZ: " << workTime << "\n";
 					this->jobSize = (this->jobSize + newMeanWork) / 2;
 					this->jobSize = this->jobSize == 0 ? 1 : jobSize;
 			}
