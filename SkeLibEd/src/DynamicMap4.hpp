@@ -120,10 +120,10 @@ public:
 				}
 				// set new jobSize
 				//scoreboard->printWork(id, workTime);
-				scoreboard->switchWorkload(meanElements);
 				//scoreboard->jobSize = (scoreboard->jobSize + meanElements) / 2;
 				// get new data
 				if (scoreboard->curIndex + scoreboard->jobSize < scoreboard->inputSize) {
+					scoreboard->switchWorkload(meanElements);
 					elementsCount = scoreboard->jobSize;
 					elementIndex = scoreboard->curIndex;
 					scoreboard->curIndex += scoreboard->jobSize;
