@@ -63,7 +63,8 @@ public:
 			// analysis
 			//double meanTime;
 			size_t startItems;
-			void switchWorkload(size_t newMeanWork) {
+			void switchWorkload(size_t newMeanWork, double workTime) {
+				std::cout << "SWITCH FROM: " << jobSize << "\t TO: "<< newMeanWork << "\t CUZ: " << workTime;
 					this->jobSize = (this->jobSize + newMeanWork) / 2;
 					this->jobSize = this->jobSize == 0 ? 1 : jobSize;
 			}
@@ -123,7 +124,7 @@ public:
 				//scoreboard->jobSize = (scoreboard->jobSize + meanElements) / 2;
 				// get new data
 				if (scoreboard->curIndex + scoreboard->jobSize < scoreboard->inputSize) {
-					scoreboard->switchWorkload(meanElements);
+					scoreboard->switchWorkload(meanElements, workTime);
 					elementsCount = scoreboard->jobSize;
 					elementIndex = scoreboard->curIndex;
 					scoreboard->curIndex += scoreboard->jobSize;
