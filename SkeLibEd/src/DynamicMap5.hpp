@@ -157,7 +157,7 @@ public:
 			size_t newJobSize = 0;
 			while (duration == 0.0f);			// guard if we are using analyser
 			//duration = duration * nthreads;
-			duration = 1000000.0f; // 1milisec
+			//duration = 1000000.0f; // 1milisec
 			double durationAtStart = duration;
 			// analyse worksize
 			while (duration > 0.0f && newJobSize < input->size()) {
@@ -169,6 +169,10 @@ public:
 				duration -= (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 				newJobSize++;
 			}
+			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = newJobSize;
+			//if (newJobSize == input->size())((Scoreboard<IN, OUT>*)scoreboard)->isFinished = true;
+
+			newJobSize *= (int)(1000000.0f / durationAtStart);
 		//	std::cout << "JOBSIZE: " << newJobSize << "\n";
 		//	std::cout << "TIME:  " << durationAtStart << "\n";
 		//	std::cout << "MICRO: " << durationAtStart / 1000.0f << "\n";
@@ -178,12 +182,10 @@ public:
 			//duration = duration / 1000.0f // milli
 			//if(factor < 1.0f)
 			// send work size
-			while (!((Scoreboard<IN, OUT>*)scoreboard)->scoreboardLock.try_lock());
-			if (newJobSize == input->size())((Scoreboard<IN, OUT>*)scoreboard)->isFinished = true;
-			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = newJobSize;
+			//while (!((Scoreboard<IN, OUT>*)scoreboard)->scoreboardLock.try_lock());
 			((Scoreboard<IN, OUT>*)scoreboard)->jobSize = newJobSize;
 			((Scoreboard<IN, OUT>*)scoreboard)->isInitialised = true;
-			((Scoreboard<IN, OUT>*)scoreboard)->scoreboardLock.unlock();
+			//((Scoreboard<IN, OUT>*)scoreboard)->scoreboardLock.unlock();
 		}
 
 
