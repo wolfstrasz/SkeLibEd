@@ -80,14 +80,25 @@ public:
 		// --------------------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void threadMap(Scoreboard<IN, OUT> *scoreboard, ARGs... args) {
-
+			std::chrono::high_resolution_clock::time_point thstart;
+			std::chrono::high_resolution_clock::time_point thend;
 			size_t elementsCount;
 			size_t elementIndex;
+			double timeForInit = 0.0f;
+			double timeForScore = 0.0f;
+
+			thstart = std::chrono::high_resolution_clock::now();
 			while (!scoreboard->isInitialised);
+			thend = std::chrono::high_resolution_clock::now();
+			timeForInit = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(thend - thstart).count();
+
+
 			while (!scoreboard->isFinished) {
 				// Lock scoreboard
+				thstart = std::chrono::high_resolution_clock::now();
 				while (!scoreboard->scoreboardLock.try_lock());
-
+				thend = std::chrono::high_resolution_clock::now();
+				timeForScore += (double)std::chrono::duration_cast<std::chrono::nanoseconds>(thend - thstart).count();
 				if (scoreboard->isFinished) {
 					scoreboard->scoreboardLock.unlock();
 					break;
@@ -114,6 +125,8 @@ public:
 					scoreboard->output->at(elementIndex + elementsFinished) = elemental.elemental(scoreboard->input->at(elementIndex + elementsFinished), args...);
 				}
 			}
+			std::cout << "Time for init : " << timeForInit << "\n";
+			std::cout << "Time for score : " << timeForScore << "\n";
 
 		}
 
@@ -123,7 +136,7 @@ public:
 			this->nthreads = std::thread::hardware_concurrency();
 		//	this->sizeOfWork = 0;
 			this->duration = 0.0f;
-			this->allThreads = new std::thread*[nthreads];
+			//this->allThreads = new std::thread*[nthreads];
 		}
 
 	public:
@@ -166,7 +179,7 @@ public:
 		// -----------------------------------
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
-			//this->allThreads = new std::thread*[nthreads];
+			this->allThreads = new std::thread*[nthreads];
 			scoreboard = new Scoreboard<IN, OUT>(&input, &output);
 			
 			//std::cout << "THREADER INIT\n";
@@ -207,8 +220,11 @@ public:
 
 			// Join threads
 			// -----------------------------------------------------------------------------------
-			for (size_t t = 0; t < nthreads; ++t) { allThreads[t]->join(); delete allThreads[t]; }
-			//delete allThreads;
+			for (size_t t = 0; t < nthreads; ++t) {
+				allThreads[t]->join(); 
+				delete allThreads[t]; 
+			}
+			delete allThreads;
 			delete ((Scoreboard<IN, OUT>*)scoreboard);
 
 		}
