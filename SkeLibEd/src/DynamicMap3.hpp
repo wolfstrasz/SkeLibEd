@@ -166,7 +166,7 @@ public:
 			duration = duration * nthreads * nthreads;
 
 			// analyse worksize
-			while (duration > 0.0f) {
+			while (duration > 0.0f && newJobSize < input->size()) {
 				tstart = std::chrono::high_resolution_clock::now();
 				if (newJobSize >= input->size())
 					std::cout << "ACCESS OUT OF RANGE AT THREAD: MAIN: " << newJobSize << "\n";
@@ -179,6 +179,7 @@ public:
 
 			// send work size
 			while (!((Scoreboard<IN, OUT>*)scoreboard)->scoreboardLock.try_lock());
+			if (newJobSize = input->size())((Scoreboard<IN, OUT>*)scoreboard)->isFinished = true;
 			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = newJobSize;
 			((Scoreboard<IN, OUT>*)scoreboard)->jobSize = newJobSize;
 			((Scoreboard<IN, OUT>*)scoreboard)->isInitialised = true;
