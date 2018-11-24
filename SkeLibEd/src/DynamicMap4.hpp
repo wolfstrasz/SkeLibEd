@@ -69,6 +69,7 @@ public:
 				jobSize = (jobSize + newMeanWork) / 2;
 				jobSize = jobSize == 0 ? 1 : jobSize;
 				std::cout << "\tTO: " << jobSize << "\n";
+				int getchar();
 			}
 			void printWork(size_t id, double workTime) {
 				std::cout << "THREAD: " << id << "\t WORKTIME: " << workTime << std::endl;
