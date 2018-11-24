@@ -172,10 +172,13 @@ public:
 				//		std::cout << "ACCESS OUT OF RANGE AT THREAD: MAIN: " << newJobSize << "\n";
 				output->at(newJobSize) = elemental.elemental(input->at(newJobSize), args...);
 				tend = std::chrono::high_resolution_clock::now();
-				duration -= (double)std::chrono::duration_cast<std::chrono::microseconds>(tend - tstart).count();
+				duration -= (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 				newJobSize++;
 			}
 			std::cout << "JOBSIZE: " << newJobSize << "\n";
+			std::cout << "TIME:  " << duration << "\n";
+			std::cout << "MICRO: " << duration / 1000.0f << "\n";
+			std::cout << "MILLI: " << duration / 1000.0f / 1000.0f << "\n";
 			//sizeOfWork = newJobSize;
 			//factor = duration / (1000.0f 1000.0f); //micro
 			//duration = duration / 1000.0f // milli
