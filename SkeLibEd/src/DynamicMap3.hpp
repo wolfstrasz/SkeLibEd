@@ -58,7 +58,7 @@ public:
 			// scoreboard worksize
 			size_t jobSize;
 			// guard
-			std::mutex scoreboardInUse;
+			std::mutex scoreboardLock;
 
 			// constructor
 			Scoreboard(std::vector<IN> *in, std::vector<OUT> *out) {
@@ -83,10 +83,10 @@ public:
 			size_t elementIndex;
 			while (!scoreboard->isFinished) {
 				// Lock scoreboard
-				while (!scoreboard->scoreboardInUse.try_lock());
+				while (!scoreboard->scoreboardLock.try_lock());
 
 				if (scoreboard->isFinished) {
-					scoreboard->scoreboardInUse.unlock();
+					scoreboard->scoreboardLock.unlock();
 					break;
 				}
 
@@ -103,7 +103,7 @@ public:
 					scoreboard->isFinished = true;
 				}
 				// unlock scoreboard
-				scoreboard->scoreboardInUse.unlock();
+				scoreboard->scoreboardLock.unlock();
 
 				// Process the data block
 				// ----------------------
@@ -152,10 +152,10 @@ public:
 			sizeOfWork = newWorkSize;
 
 			// send work size
-			while (!((Scoreboard<IN, OUT>*)scoreboard)->scoreboardInUse.try_lock());
+			while (!((Scoreboard<IN, OUT>*)scoreboard)->scoreboardLock.try_lock());
 			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
 			((Scoreboard<IN, OUT>*)scoreboard)->jobSize = sizeOfWork;
-			((Scoreboard<IN, OUT>*)scoreboard)->scoreboardInUse.unlock();
+			((Scoreboard<IN, OUT>*)scoreboard)->scoreboardLock.unlock();
 		}
 
 
