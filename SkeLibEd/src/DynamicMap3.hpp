@@ -56,7 +56,7 @@ public:
 			size_t inputSize;
 			size_t curIndex;
 			// scoreboard worksize
-			size_t itemsCount;
+			size_t jobSize;
 			// guard
 			std::mutex scoreboardInUse;
 
@@ -67,7 +67,7 @@ public:
 				isFinished = false;
 				inputSize = in->size();
 				curIndex = 0;
-				itemsCount = 0;
+				jobSize = 0;
 			}
 			~Scoreboard() {}
 		};
@@ -91,10 +91,10 @@ public:
 				}
 
 				// get new data
-				if (scoreboard->curIndex + scoreboard->itemsCount < scoreboard->inputSize) {
-					elementsCount = scoreboard->itemsCount;
+				if (scoreboard->curIndex + scoreboard->jobSize < scoreboard->inputSize) {
+					elementsCount = scoreboard->jobSize;
 					elementIndex = scoreboard->curIndex;
-					scoreboard->curIndex += scoreboard->itemsCount;
+					scoreboard->curIndex += scoreboard->jobSize;
 				}
 				else {
 					elementsCount = scoreboard->inputSize - scoreboard->curIndex;
@@ -154,7 +154,7 @@ public:
 			// send work size
 			while (!((Scoreboard<IN, OUT>*)scoreboard)->scoreboardInUse.try_lock());
 			((Scoreboard<IN, OUT>*)scoreboard)->curIndex = sizeOfWork;
-			((Scoreboard<IN, OUT>*)scoreboard)->itemsCount = sizeOfWork;
+			((Scoreboard<IN, OUT>*)scoreboard)->jobSize = sizeOfWork;
 			((Scoreboard<IN, OUT>*)scoreboard)->scoreboardInUse.unlock();
 		}
 
