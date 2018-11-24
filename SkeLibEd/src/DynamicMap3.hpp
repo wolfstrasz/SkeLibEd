@@ -65,7 +65,7 @@ public:
 			std::vector<double> scoretiming;
 			std::vector<double> inittiming;
 			// constructor
-			Scoreboard(std::vector<IN> *in, std::vector<OUT> *out) {
+			Scoreboard(std::vector<IN> *in, std::vector<OUT> *out, size_t nthreads) {
 				this->input = in;
 				this->output = out;
 				isFinished = false;
@@ -187,7 +187,7 @@ public:
 		template<typename IN, typename OUT, typename ...ARGs>
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 			this->allThreads = new std::thread*[nthreads];
-			scoreboard = new Scoreboard<IN, OUT>(&input, &output);
+			scoreboard = new Scoreboard<IN, OUT>(&input, &output, nthreads);
 			
 			//std::cout << "THREADER INIT\n";
 			// USE THREADER
