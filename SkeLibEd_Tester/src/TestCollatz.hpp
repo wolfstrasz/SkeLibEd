@@ -97,6 +97,7 @@ namespace collatz {
 			}
 		}
 		if (same)std::cout << "SAME OUTPUT" << std::endl;
+		std::cout << dynMapOut[1234] << std::endl;
 		if (!same) {
 			for (size_t i = 0; i < itemcount; i += 10000) {
 				if (dynMapOut[i] != mapOut[i])std::cout << i << std::endl;
