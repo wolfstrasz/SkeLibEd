@@ -4,7 +4,11 @@
 #include "Map.hpp"
 //#include "DynamicMap.hpp"
 //#include "DynamicMap2.hpp"
-#include "DynamicMap3.hpp"
+//#include "DynamicMap3.hpp"
+//#include "DynamicMap4.hpp"
+//#include "DynamicMap5.hpp"
+#include "DynamicMap4.hpp"
+
 #include <chrono>
 #include <iostream>
 #include <fstream>
@@ -71,8 +75,9 @@ namespace collatz {
 
 		//	auto dynamicMap = DynamicMap(collatz_elemental, threadcount, itemcount / (blockcount * threadcount));
 			auto dynamicMap = DynamicMap(collatz_elemental);
+		//	std::cout << "DYNAMIC MAP Test: " << test << std::endl;
 			dynamicMap(dynMapOut, in, arg);
-			dynamicMap.stop();
+			//dynamicMap.stop();
 
 			auto end = std::chrono::system_clock::now();
 			time += (end - start);
@@ -91,6 +96,8 @@ namespace collatz {
 				break;
 			}
 		}
+		if (same)std::cout << "SAME OUTPUT" << std::endl;
+		std::cout << dynMapOut[1234] << std::endl;
 		if (!same) {
 			for (size_t i = 0; i < itemcount; i += 10000) {
 				if (dynMapOut[i] != mapOut[i])std::cout << i << std::endl;

@@ -5,7 +5,12 @@
 
 #include "Map.hpp"
 //#include "DynamicMap.hpp"
-#include "DynamicMap2.hpp"
+//#include "DynamicMap2.hpp"
+//#include "DynamicMap3.hpp"
+//#include "DynamicMap5.hpp"
+#include "DynamicMap4.hpp"
+
+
 #include <chrono>
 #include <iostream>
 #include <fstream>
@@ -122,12 +127,18 @@ namespace nbody {
 		// particle vectors initialization
 		nbody_init(particles, indices, np);
 
-		std::cout<<" SIZES " << np << " : " << iterations << std::endl;
+		// std::cout<<" SIZES " << np << " : " << iterations << std::endl;
 
 		for (size_t i = 0; i < iterations; i += 2) {
+		//	std::cout << " ITER " << i << std::endl;
+
 			nbody_simulate_step(doublebuffer, indices, particles);
+		//	std::cout << " ITER " << i+1 << std::endl;
+
 			nbody_simulate_step(particles, indices, doublebuffer);
 		}
+	//	std::cout << " SIZES " << np << " : " << iterations << std::endl;
+
 	}
 	// Function of Dynamic map
 	void dnbody(std::vector<Particle> &particles) {
@@ -137,8 +148,8 @@ namespace nbody {
 
 		std::vector<size_t> indices(particles.size());
 
-		auto nbody_init = DynamicMap(init, threads, np / (blocks * threads));
-		auto nbody_simulate_step = DynamicMap(move, threads, np / (blocks * threads));
+		auto nbody_init = DynamicMap(init/*, threads , np / (blocks * threads)*/);
+		auto nbody_simulate_step = DynamicMap(move/*, threads, np / (blocks * threads)*/);
 
 		// initialization of indices vector
 		for (size_t i = 0; i < particles.size(); i++) {
@@ -147,7 +158,7 @@ namespace nbody {
 		// particle vectors initialization
 		nbody_init(particles, indices, np);
 
-		std::cout<<" SIZES " << np << " : " << iterations << std::endl;
+	//	std::cout<<" SIZES " << np << " : " << iterations << std::endl;
 		for (size_t i = 0; i < iterations; i += 2) {
 			nbody_simulate_step(doublebuffer, indices, particles);
 			nbody_simulate_step(particles, indices, doublebuffer);
@@ -156,14 +167,14 @@ namespace nbody {
 
 
 	void test(size_t threadcount, size_t blockcount, size_t np, size_t iters) {
-		std::cout << "THREADS: " << threadcount << std::endl;		// number of threads
-		std::cout << "BLOCKS:  " << blockcount << std::endl;		// number of blocks
-		std::cout << "IC:      " << np << std::endl;		// number of items in a dimension
-		std::cout << "ITERS:   " << iters << std::endl;		// number of iterations
+	//	std::cout << "THREADS: " << threadcount << std::endl;		// number of threads
+	//	std::cout << "BLOCKS:  " << blockcount << std::endl;		// number of blocks
+	//	std::cout << "IC:      " << np << std::endl;		// number of items in a dimension
+	//	std::cout << "ITERS:   " << iters << std::endl;		// number of iterations
 
 		// Output file
-		std::string folderName = "nbody2_" + std::to_string(std::thread::hardware_concurrency()) + "/";
-		std::string outfileName = folderName + "nbody_" + std::to_string(threadcount) + "T_"
+	//	std::string folderName = "nbody2_" + std::to_string(std::thread::hardware_concurrency()) + "/";
+		std::string outfileName = /*folderName + */"nbody_" + std::to_string(threadcount) + "T_"
 			+ std::to_string(blockcount) + "B_" + std::to_string(np) + "P_" + std::to_string(iters) + "IT";
 		std::ofstream outfile;
 		outfile.open(outfileName);
@@ -179,6 +190,7 @@ namespace nbody {
 
 		// test static map
 		// -------------------------------------------
+		std::cout << "SMAP TEST\n";
 		auto start = std::chrono::system_clock::now();
 		snbody(sParticles);
 		auto end = std::chrono::system_clock::now();
@@ -187,6 +199,7 @@ namespace nbody {
 
 		// test dynamic map
 		// ----------------------------------------------
+		std::cout << "DMAP TEST\n";
 		start = std::chrono::system_clock::now();
 		dnbody(sParticles);
 		end = std::chrono::system_clock::now();

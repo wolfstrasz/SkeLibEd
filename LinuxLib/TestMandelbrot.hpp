@@ -4,7 +4,11 @@
 
 #include "Map.hpp"
 //#include "DynamicMap.hpp"
-#include "DynamicMap2.hpp"
+//#include "DynamicMap2.hpp"
+//#include "DynamicMap3.hpp"
+//#include "DynamicMap5.hpp"
+#include "DynamicMap4.hpp"
+
 #include <chrono>
 #include <iostream>
 #include <fstream>
@@ -27,7 +31,7 @@ namespace mandelbrot {
 		}
 	};
 
-	pixel_t mandelbrot_elemental(size_t taskid, double magnification, size_t xres, size_t yres, size_t itermax, size_t blocksize) {
+	pixel_t mandelbrot_elemental(size_t taskid, double magnification, size_t xres, size_t yres, size_t itermax/*, size_t blocksize = 0*/) {
 
 		pixel_t pixel;
 		double x, xx, y, cx, cy;
@@ -47,14 +51,14 @@ namespace mandelbrot {
 		}
 
 		if (iteration <= itermax) {
-			pixel.r = 0; pixel.g = 0; pixel.b = 0;
+			pixel.r = 0; pixel.g = 150; pixel.b = 150;
 		}
 		else {
 			pixel.r = 255; pixel.g = 0; pixel.b = 0;
 		}
- 		pixel.g = ((((double)colortint) / itermax) * 255) ;// (colortint % (255/32) )* 32;
-		if (taskid % (blocksize*2) < blocksize) pixel.b = 0;
-		else pixel.b = 255;
+ 	//	pixel.g = ((((double)colortint) / itermax) * 255) ;// (colortint % (255/32) )* 32;
+	//	if (taskid % (blocksize*2) < blocksize) pixel.b = 0;
+	//	else pixel.b = 255;
 
 		return pixel;
 	}
@@ -62,8 +66,8 @@ namespace mandelbrot {
 	void test(size_t threadcount, size_t blockcount, size_t ixc, size_t iyc,size_t itermax, double arg) {
 		int itemcount = ixc * iyc;
 		// output file
-		std::string folderName = "mandel2_" + std::to_string(std::thread::hardware_concurrency()) + "/";
-		std::string outfileName = folderName + "mandel_" + std::to_string(threadcount) + "T_"
+		//std::string folderName = "mandel2_" + std::to_string(std::thread::hardware_concurrency()) + "/";
+		std::string outfileName = /*folderName + */"mandel_" + std::to_string(threadcount) + "T_"
 			+ std::to_string(blockcount) + "B_" + std::to_string(ixc) + "D_"
 			+ std::to_string(itermax) + "IT_" + std::to_string((int)arg) + "MAG";
 		std::ofstream outfile;
@@ -90,7 +94,7 @@ namespace mandelbrot {
 			auto start = std::chrono::system_clock::now();
 
 			auto map = Map(mandelbrot_elemental, threadcount, blockcount);
-			map(mapOut, in, arg, ixc, iyc, itermax, itemcount / (blockcount * threadcount));
+			map(mapOut, in, arg, ixc, iyc, itermax/*, itemcount / (blockcount * threadcount)*/);
 
 			auto end = std::chrono::system_clock::now();
 			time += (end - start);
@@ -107,8 +111,8 @@ namespace mandelbrot {
 
 			auto start = std::chrono::system_clock::now();
 
-			auto dynamicMap = DynamicMap(mandelbrot_elemental, threadcount, itemcount / (blockcount * threadcount));
-			dynamicMap(dynMapOut, in, arg, ixc, iyc, itermax, itemcount / (blockcount * threadcount));
+			auto dynamicMap = DynamicMap(mandelbrot_elemental /*, threadcount, itemcount / (blockcount * threadcount)*/);
+			dynamicMap(dynMapOut, in, arg, ixc, iyc, itermax /*, itemcount / (blockcount * threadcount)*/);
 
 			auto end = std::chrono::system_clock::now();
 			time += (end - start);

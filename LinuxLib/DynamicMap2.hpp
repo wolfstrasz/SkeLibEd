@@ -49,13 +49,8 @@ public:
             // constructor
             Scoreboard(){
                 this->isFinished = false;
-            //    this->inputSize = input.size();
                 this->curIndex = 0;
-            //    this->itemsCount = 0;
-            //    this->finishedJobs = 0;
-            //    this->sentJobs = 0;
             }
-
             // input output
             std::vector<OUT> *output;
             std::vector<IN> *input;
@@ -65,9 +60,6 @@ public:
 			size_t inputSize;
 			size_t curIndex;
 			size_t itemsCount;
-            // see what work is doen
-		//	int finishedJobs;
-			//int sentJobs;
             // guard
 			std::mutex scoreboardInUse;
 
@@ -75,7 +67,6 @@ public:
 
 		// ThreadMap - function applied to each thread
 		// --------------------------------------------
-		//	THREADS[t] = new std::thread(&MapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, threadArguments, t, args...);
 		template<typename IN, typename OUT, typename ...ARGs>
 		void threadMap(Scoreboard<IN,OUT> *scoreboard, size_t threadID, ARGs... args) {
 
@@ -135,9 +126,6 @@ public:
 
 
 
-            // std::cout << "Thread count: " <<nthreads<< std::endl;
-		    // std::cout << "Size of chunk: "<<sizeOfChunk<<std::endl;
-		    // std::cout << "Imput size: "<<input.size()<<std::endl;
 			std::thread *THREADS[nthreads];
 			std::vector<OUT> tempOutput(input.size());
             Scoreboard<IN,OUT> *scoreboard = new Scoreboard<IN, OUT>();
@@ -151,20 +139,6 @@ public:
 			//std::cout << "RUNNING THREADS" << std::endl;
 			for (size_t t = 0; t< nthreads; t++)
 				THREADS[t] = new std::thread(&DynamicMapImplementation<EL>::threadMap<IN, OUT, ARGs...>, this, scoreboard, t, args...);
-			//
-			//
-			// // Assign new jobs until work is done
-			// // ----------------------------------
-			// while (!scoreboard->isFinished) {
-			//
-            //     if (scoreboard->curIndex == input.size())
-            //         scoreboard->isFinished = true;
-			//
-			// }
-
-			//std::cout << "FINISHED THREADS" << std::endl;
-			//std::cout << "At end sentJobs: "<<scoreboard->sentJobs<<std::endl;
-			//std::cout << "At end finishedJobs: "<< scoreboard->finishedJobs<<std::endl;
 
 			// Join threads
 			// ------------
@@ -176,11 +150,6 @@ public:
 			delete scoreboard;
 		}
 
-		// Utility functions for setting options
-		// ------------------------------------
-		//void setNumberOfBlocks(size_t nblocks) { this->nDataBlocks = nblocks; }
-		void setNumberOfThreads(size_t nthreads) { this->nthreads = nthreads; }
-		void setSizeOfChunk(size_t sizeOfChunk) { this->sizeOfChunk = sizeOfChunk;  }
 		// Friend Functions for Dynamic Map Implementation Class
 		// -----------------------------------------------------
 		template<typename EL2>
