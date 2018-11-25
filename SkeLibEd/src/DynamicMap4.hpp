@@ -68,7 +68,7 @@ public:
 					<< "\t CUZ: " << workTime << "\n";
 					this->jobSize = (this->jobSize + newMeanWork) / 2;
 					this->jobSize = this->jobSize == 0 ? 1 : jobSize;
-					std::cout << "JOBS DONE: " << <<"\n";
+					std::cout << "JOBS DONE: " <<this->jobsDone <<"\n";
 			}
 			// timing
 			//std::vector<double>* scoretiming;
