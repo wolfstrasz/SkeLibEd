@@ -128,7 +128,7 @@ public:
 				{
 					meanTime = workTime / elementsCount;
 					meanElements = 1.00f / meanTime;
-					scoreboard->switchWorkload(meanElements, workTime);
+					scoreboard->switchWorkload(meanElements, workTime, id);
 				}
 				// get new data
 				if (scoreboard->curIndex + scoreboard->jobSize < scoreboard->inputSize) {
