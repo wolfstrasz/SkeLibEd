@@ -59,11 +59,10 @@ public:
 			size_t jobSize;
 			// guard
 			std::mutex scoreboardLock;
-			size_t jobsDone = 0;
 			// analysis
 			//double meanTime;
 			size_t startItems;
-			void switchWorkload(size_t newMeanWork, double workTime, size_t id) {
+			void switchWorkload(size_t newMeanWork) {
 			//	std::cout << "THREAD(" << id << ")->SWITCH FROM: " << jobSize << "\t TO: "<< (jobSize + newMeanWork) / 2
 			//		<< "\t CUZ: " << workTime << "\n";
 					this->jobSize = (this->jobSize + newMeanWork) / 2;
@@ -106,7 +105,6 @@ public:
 			size_t meanElements;
 			size_t elementsCount = 0;
 			size_t elementIndex = 0;
-		//	double scoreTime;
 			
 			while (!scoreboard->isInitialised);
 			meanElements = scoreboard->jobSize;
@@ -116,28 +114,17 @@ public:
 				//thstart = std::chrono::high_resolution_clock::now();
 				while (!scoreboard->scoreboardLock.try_lock());
 				//	thend = std::chrono::high_resolution_clock::now();
-				//	timeForScore += (double)std::chrono::duration_cast<std::chrono::nanoseconds>(thend - thstart).count();
 				if (scoreboard->isFinished) {
 					scoreboard->scoreboardLock.unlock();
 					break;
 				}
 
 				// set new jobSize
-				if (workTime > 1.25f)
+				if (workTime > 1.25f || workTime < 0.50f)
 				{
 					meanTime = workTime / elementsCount;
 					meanElements = 1.00f / meanTime;
-					meanElements = meanElements < (scoreboard->inputSize / 2) ? scoreboard->inputSize / 2 : meanElements;
-
-					scoreboard->switchWorkload(meanElements, workTime, id);
-				}
-				if (workTime < 0.50f)
-				{
-					meanTime = workTime / elementsCount;
-					meanElements = 1.00f / meanTime;
-					meanElements = meanElements > (scoreboard->inputSize * 2) ? scoreboard->inputSize * 2 : meanElements;
-
-						scoreboard->switchWorkload(meanElements, workTime, id);
+					scoreboard->switchWorkload(meanElements);
 				}
 				// get new data
 				if (scoreboard->curIndex + scoreboard->jobSize < scoreboard->inputSize) {
