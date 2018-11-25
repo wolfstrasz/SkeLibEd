@@ -1,0 +1,54 @@
+#!/bin/bash
+echo "TESTING COLLATZ"
+
+echo "10^6 items in 64 MAX cores"
+echo "./run.out 1 64 8 1000000 2.0"
+./run.out 1 64 8 1000000 2.0
+
+echo "./run.out 1 64 16 1000000 2.0"
+./run.out 1 64 16 1000000 2.0
+
+echo "./run.out 1 64 32 1000000 2.0"
+./run.out 1 64 32 1000000 2.0
+
+echo "./run.out 1 64 64 1000000 2.0"
+./run.out 1 64 64 1000000 2.0
+
+echo "./run.out 1 64 128 1000000 2.0"
+./run.out 1 64 128 1000000 2.0
+
+
+echo "10^7 items in 64 MAX cores"
+echo "./run.out 1 64 8 10000000 2.0"
+./run.out 1 64 8 10000000 2.0
+
+echo "./run.out 1 64 16 10000000 2.0"
+./run.out 1 64 16 10000000 2.0
+
+echo "./run.out 1 64 32 10000000 2.0"
+./run.out 1 64 32 10000000 2.0
+
+echo "./run.out 1 64 64 10000000 2.0"
+./run.out 1 64 64 10000000 2.0
+
+echo "./run.out 1 64 128 10000000 2.0"
+./run.out 1 64 128 10000000 2.0
+
+
+echo "10^8 items in 64 MAX cores"
+echo "./run.out 1 64 8 100000000 2.0"
+./run.out 1 64 8 100000000 2.0
+
+echo "./run.out 1 64 16 100000000 2.0"
+./run.out 1 64 16 100000000 2.0
+
+echo "./run.out 1 64 32 100000000 2.0"
+./run.out 1 64 32 100000000 2.0
+
+echo "./run.out 1 64 64 100000000 2.0"
+./run.out 1 64 64 100000000 2.0
+
+echo "./run.out 1 64 128 100000000 2.0"
+./run.out 1 64 128 100000000 2.0
+
+
