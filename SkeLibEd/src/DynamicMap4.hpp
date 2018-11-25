@@ -149,7 +149,7 @@ public:
 				workTime = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(wend - wstart).count();
 				
 				workTime = workTime / 1000000;
-				if (workTime > 1.50f || workTime < 0.50f)
+				if (workTime > 1.50f || workTime < 0.25f)
 				{
 					meanTime = workTime / elementsCount;
 					meanElements = 1.00f / meanTime;
@@ -241,15 +241,6 @@ public:
 
 		}
 
-		void stop() {
-
-		}
-
-
-		// Utility functions for setting options
-		// ------------------------------------
-		void setNumberOfThreads(size_t nthreads) { this->nthreads = nthreads; }
-		void setSizeOfChunk(size_t sizeOfChunk) { this->sizeOfChunk = sizeOfChunk; }
 
 		// Friend Functions for Dynamic Map Implementation Class
 		// -----------------------------------------------------
