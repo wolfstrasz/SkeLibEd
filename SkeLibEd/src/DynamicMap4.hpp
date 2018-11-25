@@ -154,6 +154,7 @@ public:
 					meanTime = workTime / elementsCount;
 					meanElements = 1.00f / meanTime;
 				}
+				else meanElements = elementsCount;
 			}
 
 		}
