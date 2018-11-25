@@ -123,7 +123,7 @@ public:
 				// set new jobSize
 				//scoreboard->printWork(id, workTime);
 				//scoreboard->jobSize = (scoreboard->jobSize + meanElements) / 2;
-				if (workTime > 1.15f || workTime < 0.50f) // more thant 1.25 milisecs work weight has increased
+				if (workTime > 1.25f || workTime < 0.50f) // more thant 1.25 milisecs work weight has increased
 				{
 					meanTime = workTime / elementsCount;
 					meanElements = 1.00f / meanTime;
