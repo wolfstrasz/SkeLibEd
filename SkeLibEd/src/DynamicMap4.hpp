@@ -112,7 +112,9 @@ public:
 			while (!scoreboard->isFinished) {
 				// Lock scoreboard
 				//thstart = std::chrono::high_resolution_clock::now();
-				while (!scoreboard->scoreboardLock.try_lock());
+				while (!scoreboard->scoreboardLock.try_lock()) {
+					if (scoreboard->isFinished) break;
+				}
 				//	thend = std::chrono::high_resolution_clock::now();
 				if (scoreboard->isFinished) {
 					scoreboard->scoreboardLock.unlock();
@@ -123,12 +125,7 @@ public:
 				// get new data
 				if (scoreboard->curIndex + scoreboard->jobSize < scoreboard->inputSize) {
 					// set new jobSize
-					if (workTime > 1.25f || workTime < 0.50f)
-					{
-						meanTime = workTime / elementsCount;
-						meanElements = 1.00f / meanTime;
-						scoreboard->switchWorkload(meanElements);
-					}
+				
 					elementsCount = scoreboard->jobSize;
 					elementIndex = scoreboard->curIndex;
 					scoreboard->curIndex += scoreboard->jobSize;
@@ -152,7 +149,12 @@ public:
 				workTime = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(wend - wstart).count();
 				
 				workTime = workTime / 1000000;
-				
+				if (workTime > 1.50f || workTime < 0.50f)
+				{
+					meanTime = workTime / elementsCount;
+					meanElements = 1.00f / meanTime;
+					scoreboard->switchWorkload(meanElements);
+				}
 			}
 
 		}
