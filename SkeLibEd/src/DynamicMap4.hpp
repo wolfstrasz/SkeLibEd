@@ -127,7 +127,7 @@ public:
 				{
 					meanTime = workTime / elementsCount;
 					meanElements = 1.00f / meanTime;
-					meanElements = meanElements < (scoreboard->inputSize / 2) ? scoreboard->inputSize / 2 : meanElements
+					meanElements = meanElements < (scoreboard->inputSize / 2) ? scoreboard->inputSize / 2 : meanElements;
 
 					scoreboard->switchWorkload(meanElements, workTime, id);
 				}
@@ -135,7 +135,7 @@ public:
 				{
 					meanTime = workTime / elementsCount;
 					meanElements = 1.00f / meanTime;
-					meanElements = meanElements > (scoreboard->inputSize * 2) ? scoreboard->inputSize * 2 : meanElements
+					meanElements = meanElements > (scoreboard->inputSize * 2) ? scoreboard->inputSize * 2 : meanElements;
 
 						scoreboard->switchWorkload(meanElements, workTime, id);
 				}
