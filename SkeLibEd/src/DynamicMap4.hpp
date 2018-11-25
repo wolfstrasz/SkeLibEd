@@ -64,11 +64,11 @@ public:
 			//double meanTime;
 			size_t startItems;
 			void switchWorkload(size_t newMeanWork, double workTime, size_t id) {
-				std::cout << "THREAD(" << id << ")->SWITCH FROM: " << jobSize << "\t TO: "<< (jobSize + newMeanWork) / 2
-					<< "\t CUZ: " << workTime << "\n";
-				if(newMeanWork != 0)	this->jobSize = (this->jobSize + newMeanWork) / 2;
+			//	std::cout << "THREAD(" << id << ")->SWITCH FROM: " << jobSize << "\t TO: "<< (jobSize + newMeanWork) / 2
+			//		<< "\t CUZ: " << workTime << "\n";
+					this->jobSize = (this->jobSize + newMeanWork) / 2;
 					this->jobSize = this->jobSize == 0 ? 1 : jobSize;
-					std::cout << "JOBS DONE: " <<this->jobsDone <<"\n";
+			//		std::cout << "JOBS DONE: " <<this->jobsDone <<"\n";
 			}
 			// timing
 			//std::vector<double>* scoretiming;
@@ -122,11 +122,7 @@ public:
 					break;
 				}
 
-				scoreboard->jobsDone += elementsCount;
-				scoreboard->switchWorkload(0, 1111, 1111);
 				// set new jobSize
-				//scoreboard->printWork(id, workTime);
-				//scoreboard->jobSize = (scoreboard->jobSize + meanElements) / 2;
 				if (workTime > 1.25f || workTime < 0.50f) // more thant 1.25 milisecs work weight has increased
 				{
 					meanTime = workTime / elementsCount;
