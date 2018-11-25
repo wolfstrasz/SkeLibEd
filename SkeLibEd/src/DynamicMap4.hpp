@@ -66,7 +66,7 @@ public:
 			void switchWorkload(size_t newMeanWork, double workTime, size_t id) {
 				std::cout << "THREAD(" << id << ")->SWITCH FROM: " << jobSize << "\t TO: "<< (jobSize + newMeanWork) / 2
 					<< "\t CUZ: " << workTime << "\n";
-					this->jobSize = (this->jobSize + newMeanWork) / 2;
+				if(newMeanWork != 0)	this->jobSize = (this->jobSize + newMeanWork) / 2;
 					this->jobSize = this->jobSize == 0 ? 1 : jobSize;
 					std::cout << "JOBS DONE: " <<this->jobsDone <<"\n";
 			}
@@ -123,7 +123,7 @@ public:
 				}
 
 				scoreboard->jobsDone += elementsCount;
-				scoreboard->switchWorkload(scoreboard->jobSize, 1111, 1111);
+				scoreboard->switchWorkload(0, 1111, 1111);
 				// set new jobSize
 				//scoreboard->printWork(id, workTime);
 				//scoreboard->jobSize = (scoreboard->jobSize + meanElements) / 2;
