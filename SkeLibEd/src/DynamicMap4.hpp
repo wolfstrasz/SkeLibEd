@@ -119,16 +119,16 @@ public:
 					break;
 				}
 
-				// set new jobSize
-				if (workTime > 1.25f || workTime < 0.50f)
-				{
-					meanTime = workTime / elementsCount;
-					meanElements = 1.00f / meanTime;
-					scoreboard->switchWorkload(meanElements);
-				}
+				
 				// get new data
 				if (scoreboard->curIndex + scoreboard->jobSize < scoreboard->inputSize) {
-					
+					// set new jobSize
+					if (workTime > 1.25f || workTime < 0.50f)
+					{
+						meanTime = workTime / elementsCount;
+						meanElements = 1.00f / meanTime;
+						scoreboard->switchWorkload(meanElements);
+					}
 					elementsCount = scoreboard->jobSize;
 					elementIndex = scoreboard->curIndex;
 					scoreboard->curIndex += scoreboard->jobSize;
