@@ -59,7 +59,7 @@ public:
 			size_t jobSize;
 			// guard
 			std::mutex scoreboardLock;
-
+			size_t jobsDone = 0;
 			// analysis
 			//double meanTime;
 			size_t startItems;
@@ -68,7 +68,7 @@ public:
 					<< "\t CUZ: " << workTime << "\n";
 					this->jobSize = (this->jobSize + newMeanWork) / 2;
 					this->jobSize = this->jobSize == 0 ? 1 : jobSize;
-					std::cout << "JOBS DONE: " << curIndex<<"\n";
+					std::cout << "JOBS DONE: " << <<"\n";
 			}
 			// timing
 			//std::vector<double>* scoretiming;
@@ -104,8 +104,8 @@ public:
 			double workTime = 1.0f;
 			double meanTime = 0.0f;
 			size_t meanElements;
-			size_t elementsCount;
-			size_t elementIndex;
+			size_t elementsCount = 0;
+			size_t elementIndex = 0;
 		//	double scoreTime;
 			
 			while (!scoreboard->isInitialised);
@@ -121,6 +121,8 @@ public:
 					scoreboard->scoreboardLock.unlock();
 					break;
 				}
+
+				scoreboard->jobsDone += elementsCount;
 				// set new jobSize
 				//scoreboard->printWork(id, workTime);
 				//scoreboard->jobSize = (scoreboard->jobSize + meanElements) / 2;
