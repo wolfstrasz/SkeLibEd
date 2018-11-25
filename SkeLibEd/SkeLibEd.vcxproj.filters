@@ -30,6 +30,15 @@
     <ClInclude Include="src\Scan.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\DynamicMap3.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DynamicMap2.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DynamicMap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\DynamicMap4.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
