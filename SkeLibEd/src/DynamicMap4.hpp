@@ -123,11 +123,21 @@ public:
 				}
 
 				// set new jobSize
-				if (workTime > 1.25f || workTime < 0.50f) // more thant 1.25 milisecs work weight has increased
+				if (workTime > 1.25f)
 				{
 					meanTime = workTime / elementsCount;
 					meanElements = 1.00f / meanTime;
+					meanElements = meanElements < (scoreboard->inputSize / 2) ? scoreboard->inputSize / 2 : meanElements
+
 					scoreboard->switchWorkload(meanElements, workTime, id);
+				}
+				if (workTime < 0.50f)
+				{
+					meanTime = workTime / elementsCount;
+					meanElements = 1.00f / meanTime;
+					meanElements = meanElements > (scoreboard->inputSize * 2) ? scoreboard->inputSize * 2 : meanElements
+
+						scoreboard->switchWorkload(meanElements, workTime, id);
 				}
 				// get new data
 				if (scoreboard->curIndex + scoreboard->jobSize < scoreboard->inputSize) {
