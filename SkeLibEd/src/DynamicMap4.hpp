@@ -125,7 +125,14 @@ public:
 				//scoreboard->jobSize = (scoreboard->jobSize + meanElements) / 2;
 				// get new data
 				if (scoreboard->curIndex + scoreboard->jobSize < scoreboard->inputSize) {
-					scoreboard->switchWorkload(meanElements, workTime);
+					if (workTime > 1.50f || workTime < 0.50f) // more thant 1.25 milisecs work weight has increased
+					{
+						meanTime = workTime / elementsCount;
+						meanElements = 1.00f / meanTime;
+						scoreboard->switchWorkload(meanElements, workTime);
+					}
+					//else meanElements = elementsCount;
+					//scoreboard->switchWorkload(meanElements, workTime);
 					elementsCount = scoreboard->jobSize;
 					elementIndex = scoreboard->curIndex;
 					scoreboard->curIndex += scoreboard->jobSize;
@@ -149,12 +156,7 @@ public:
 				workTime = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(wend - wstart).count();
 				
 				workTime = workTime / 1000000;
-				if (workTime > 1.50f || workTime < 0.50f) // more thant 1.25 milisecs work weight has increased
-				{
-					meanTime = workTime / elementsCount;
-					meanElements = 1.00f / meanTime;
-				}
-				else meanElements = elementsCount;
+				
 			}
 
 		}
