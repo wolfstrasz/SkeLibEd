@@ -123,6 +123,7 @@ public:
 				}
 
 				scoreboard->jobsDone += elementsCount;
+				scoreboard->switchWorkload(scoreboard->jobSize, 1111, 1111);
 				// set new jobSize
 				//scoreboard->printWork(id, workTime);
 				//scoreboard->jobSize = (scoreboard->jobSize + meanElements) / 2;
