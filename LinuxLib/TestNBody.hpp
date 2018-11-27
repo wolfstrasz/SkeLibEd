@@ -117,8 +117,8 @@ namespace nbody {
 
 		std::vector<size_t> indices(particles.size());
 
-		auto nbody_init = Map(init, threads, blocks);
-		auto nbody_simulate_step = Map(move, threads, blocks);
+		auto nbody_init = Map(init/*, threads, blocks*/);
+		auto nbody_simulate_step = Map(move/*, threads, blocks*/);
 
 		// initialization of indices vector
 		for (size_t i = 0; i < particles.size(); i++) {
@@ -173,8 +173,8 @@ namespace nbody {
 	//	std::cout << "ITERS:   " << iters << std::endl;		// number of iterations
 
 		// Output file
-		std::string folderName = "nbody3_" + std::to_string(std::thread::hardware_concurrency()) + "/";
-		std::string outfileName = folderName + "nbody_" + std::to_string(threadcount) + "T_"
+		//std::string folderName = "nbody3_" + std::to_string(std::thread::hardware_concurrency()) + "/";
+		std::string outfileName = /*folderName +*/ "nbody_" + std::to_string(threadcount) + "T_"
 			+ std::to_string(blockcount) + "B_" + std::to_string(np) + "P_" + std::to_string(iters) + "IT";
 		std::ofstream outfile;
 		outfile.open(outfileName);

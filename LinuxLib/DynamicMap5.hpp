@@ -166,6 +166,7 @@ public:
 			//this->sizeOfWork = 1000;
 		//	allThreads = new std::thread*[nthreads];
 			this->duration = 0.0f;
+			//std::cout << "DYNMAP5\n";
 			//this->isInitialised = false;
 		}
 
