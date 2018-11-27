@@ -8,7 +8,7 @@
 //#include "DynamicMap2.hpp"
 //#include "DynamicMap3.hpp"
 //#include "DynamicMap5.hpp"
-#include "DynamicMap3.hpp"
+#include "DynamicMap2.hpp"
 
 
 #include <chrono>
@@ -173,8 +173,8 @@ namespace nbody {
 	//	std::cout << "ITERS:   " << iters << std::endl;		// number of iterations
 
 		// Output file
-		std::string folderName = "nbody3_" + std::to_string(std::thread::hardware_concurrency()) + "/";
-		std::string outfileName = folderName + "nbody_" + std::to_string(threadcount) + "T_"
+		//std::string folderName = "nbody3_" + std::to_string(std::thread::hardware_concurrency()) + "/";
+		std::string outfileName = /*folderName +*/ "nbody_" + std::to_string(threadcount) + "T_"
 			+ std::to_string(blockcount) + "B_" + std::to_string(np) + "P_" + std::to_string(iters) + "IT";
 		std::ofstream outfile;
 		outfile.open(outfileName);
