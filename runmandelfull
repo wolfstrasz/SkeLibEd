@@ -1,8 +1,0 @@
-#!/bin/bash
-echo "TESTING MANDELBROT"
-
-
-echo "./run.out 32 8 16 1024 1000 3.0"
-./run.out 4 64 100 1024 100 2.0
-
-
