@@ -117,8 +117,8 @@ namespace nbody {
 
 		std::vector<size_t> indices(particles.size());
 
-		auto nbody_init = Map(init, threads, blocks);
-		auto nbody_simulate_step = Map(move, threads, blocks);
+		auto nbody_init = Map(init/*, threads, blocks*/);
+		auto nbody_simulate_step = Map(move/*, threads, blocks*/);
 
 		// initialization of indices vector
 		for (size_t i = 0; i < particles.size(); i++) {
