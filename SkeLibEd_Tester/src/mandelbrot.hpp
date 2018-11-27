@@ -12,12 +12,12 @@
 
 
 
-void draw(size_t threadcount, size_t blockcount, size_t ixc, size_t iyc,size_t itermax, double arg){
+void draw(size_t threadcount, size_t blockcount, size_t ixc, size_t iyc, size_t itermax, double arg){
     FILE *outfile;
     int itemcount = ixc * iyc;
     //std::ofstream outfile;
     std::string outfileName = "mandel_" + std::to_string(threadcount) + "T_"
-        + std::to_string(blockcount) + "B_" + std::to_string(ixc) + "D_"
+        + std::to_string(blockcount) + "B_" + std::to_string(ixc) + "D_" + std::to_string(iyc) + "D2_"
         + std::to_string(itermax) + "IT_" + std::to_string((int)arg) + "MAG.ppm";
 
     std::vector <int> in(itemcount);
@@ -26,7 +26,7 @@ void draw(size_t threadcount, size_t blockcount, size_t ixc, size_t iyc,size_t i
     for (size_t i = 0; i < itemcount; i++) {
         in[i] = i;
     }
-    
+
     auto dynamicMap = DynamicMap(mandelbrot::mandelbrot_elemental, threadcount, itemcount / (blockcount * threadcount));
     dynamicMap(dynMapOut, in, arg, ixc, iyc, itermax, itemcount / (blockcount * threadcount));
 

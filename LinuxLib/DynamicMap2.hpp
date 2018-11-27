@@ -59,9 +59,9 @@ public:
             // detect next work
 			size_t inputSize;
 			size_t curIndex;
-			size_t itemsCount;
+			size_t jobSize;
             // guard
-			std::mutex scoreboardInUse;
+			std::mutex scoreboardLock;
 
 		};
 
@@ -75,18 +75,18 @@ public:
 			while (!scoreboard->isFinished) {
 
                     // Lock scoreboard
-                    while (!scoreboard->scoreboardInUse.try_lock());
+                    while (!scoreboard->scoreboardLock.try_lock());
 
 					if(scoreboard->isFinished) {
-						scoreboard->scoreboardInUse.unlock();
+						scoreboard->scoreboardLock.unlock();
 						break;
 					}
 
                     // get new data
-                    if (scoreboard->curIndex + scoreboard->itemsCount < scoreboard->inputSize){
-				        elementsCount = scoreboard->itemsCount;
+                    if (scoreboard->curIndex + scoreboard->jobSize < scoreboard->inputSize){
+				        elementsCount = scoreboard->jobSize;
 					    elementIndex = scoreboard->curIndex;
-                        scoreboard->curIndex += scoreboard->itemsCount;
+                        scoreboard->curIndex += scoreboard->jobSize;
                     } else {
                         elementsCount = scoreboard->inputSize - scoreboard->curIndex;
                         elementIndex = scoreboard->curIndex;
@@ -94,7 +94,7 @@ public:
 						scoreboard->isFinished = true;
                     }
                     // unlock scoreboard
-                    scoreboard->scoreboardInUse.unlock();
+                    scoreboard->scoreboardLock.unlock();
 
 					// Process the data block
 					// ----------------------
@@ -132,7 +132,7 @@ public:
 			scoreboard->input = &input;
 			scoreboard->output = &tempOutput;
 			scoreboard->inputSize = input.size();
-			scoreboard->itemsCount = sizeOfChunk;
+			scoreboard->jobSize = sizeOfChunk;
 
 			// Run threads
 			// -----------

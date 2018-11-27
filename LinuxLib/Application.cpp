@@ -15,6 +15,7 @@ int main(int argc, char* argv[]){
 	size_t blkc = 0;
 	size_t ic = 0;
 	size_t iters = 0;
+	size_t ic2 = 0;
 	double arg = 0.0f;
 	//--------------------------------------------
 	int index = 1;
@@ -28,7 +29,9 @@ int main(int argc, char* argv[]){
 	if (func != 3 ) {
 		arg = strtod(argv[index++], nullptr);
 	}
-
+//	if (func == 4){
+	//	ic2 = strtol(argv[index++], nullptr, 0);
+	//}
 	std::cout << "TEST:    " << func << std::endl;		// test functionality
 	std::cout << "THREADS: " << thrc << std::endl;		// number of threads
 	std::cout << "BLOCKS:  " << blkc << std::endl;		// number of blocks

@@ -1,0 +1,72 @@
+#!/bin/bash
+echo "TESTING MANDELBROT BLOCKSIZE"
+
+echo "MAG 1.0"
+echo "BLOCKS 2"
+./run.out 2 64 2 1024 10000 1.0
+echo "BLOCKS 5"
+./run.out 2 64 5 1024 10000 1.0
+echo "BLOCKS 8"
+./run.out 2 64 8 1024 10000 1.0
+echo "BLOCKS 10"
+./run.out 2 64 10 1024 10000 1.0
+echo "BLOCKS 12"
+./run.out 2 64 12 1024 10000 1.0
+echo "BLOCKS 20"
+./run.out 2 64 20 1024 10000 1.0
+echo "BLOCKS 32"
+./run.out 2 64 32 1024 10000 1.0
+echo "BLOCKS 64"
+./run.out 2 64 64 1024 10000 1.0
+echo "BLOCKS 128"
+./run.out 2 64 128 1024 10000 1.0
+echo "BLOCKS 256"
+./run.out 2 64 256 1024 10000 1.0
+echo "BLOCKS 512"
+./run.out 2 64 512 1024 10000 1.0
+echo "BLOCKS 1024"
+./run.out 2 64 1024 1024 10000 1.0
+echo "BLOCKS 2048"
+./run.out 2 64 2048 1024 10000 1.0
+
+
+echo "MAG4"
+echo "BLOCKS 2"
+./run.out 2 64 2 1024 10000 4.0
+echo "BLOCKS 5"
+./run.out 2 64 5 1024 10000 4.0
+echo "BLOCKS 8"
+./run.out 2 64 8 1024 10000 4.0
+echo "BLOCKS 10"
+./run.out 2 64 10 1024 10000 4.0
+echo "BLOCKS 12"
+./run.out 2 64 12 1024 10000 4.0
+echo "BLOCKS 20"
+./run.out 2 64 20 1024 10000 4.0
+echo "BLOCKS 32"
+./run.out 2 64 32 1024 10000 4.0
+echo "BLOCKS 64"
+./run.out 2 64 64 1024 10000 4.0
+echo "BLOCKS 128"
+./run.out 2 64 128 1024 10000 4.0
+echo "BLOCKS 256"
+./run.out 2 64 256 1024 10000 4.0
+echo "BLOCKS 512"
+./run.out 2 64 512 1024 10000 4.0
+echo "BLOCKS 1024"
+./run.out 2 64 1024 1024 10000 4.0
+echo "BLOCKS 2048"
+./run.out 2 64 2048 1024 10000 4.0
+
+
+
+
+
+
+
+
+
+
+
+
+
