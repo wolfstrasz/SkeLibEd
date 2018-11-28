@@ -65,7 +65,8 @@ public:
 			void switchWorkload(size_t newMeanWork) {
 				//	std::cout << "THREAD(" << id << ")->SWITCH FROM: " << jobSize << "\t TO: "<< (jobSize + newMeanWork) / 2
 				//		<< "\t CUZ: " << workTime << "\n";
-				this->jobSize = (this->jobSize + newMeanWork) / 2;
+				//this->jobSize = (this->jobSize + newMeanWork) / 2;
+				this->jobSize = newMeanWork;
 				this->jobSize = this->jobSize == 0 ? 1 : jobSize;
 				//		std::cout << "JOBS DONE: " <<this->jobsDone <<"\n";
 			}
