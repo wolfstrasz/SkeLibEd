@@ -7,7 +7,7 @@
 //#include "DynamicMap3.hpp"
 //#include "DynamicMap4.hpp"
 //#include "DynamicMap5.hpp"
-#include "DynamicMap3.hpp"
+#include "DynamicMap6.hpp"
 
 #include <chrono>
 #include <iostream>
@@ -32,8 +32,8 @@ namespace collatz {
 
 	void test(size_t threadcount, size_t blockcount, size_t itemcount, double arg) {
 		// output file
-		std::string folderName = "collatz5_" + std::to_string(std::thread::hardware_concurrency()) + "/";
-		std::string outfileName = folderName + "collatz_" + std::to_string(threadcount) + "T_"
+		//std::string folderName = "collatz5_" + std::to_string(std::thread::hardware_concurrency()) + "/";
+		std::string outfileName = /*folderName + */"collatz_" + std::to_string(threadcount) + "T_"
 			+ std::to_string(blockcount) + "B_" + std::to_string(itemcount) + "I";
 		std::ofstream outfile;
 		outfile.open(outfileName);
