@@ -4,7 +4,7 @@
 #include <fstream>
 
 #include "TestCollatz.hpp"
-#include "TestMandelbrot.hpp"
+//#include "TestMandelbrot.hpp"
 //#include "TestNBody.hpp"
 //#include "mandelbrot.hpp"
 
@@ -43,7 +43,7 @@ int main(int argc, char* argv[]){
 		collatz::test(thrc, blkc, ic, arg);
 	}
 	else if (func == 2) {
-		mandelbrot::test(thrc, blkc, ic, ic, iters, arg);
+	//	mandelbrot::test(thrc, blkc, ic, ic, iters, arg);
 	}
 	else if (func == 3) {
 	//	nbody::test(thrc, blkc, ic, iters);

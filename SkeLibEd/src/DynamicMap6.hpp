@@ -215,7 +215,7 @@ public:
 
 			size_t newJobSize = 0;
 			duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
-			duration *= nthreads-1;
+			duration *= nthreads;
 			//std::cout << duration << "\n";
 			// analyse worksize
 			while (duration > 0.0f && newJobSize < input->size()) {
