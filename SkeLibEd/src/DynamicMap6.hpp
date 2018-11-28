@@ -239,7 +239,7 @@ public:
 		void operator()(std::vector<OUT> &output, std::vector<IN> &input, ARGs... args) {
 			this->allThreads = new std::thread*[nthreads];
 			scoreboard = new Scoreboard<IN, OUT>(&input, &output, nthreads);
-			std::cout << "DM6\n";
+			//std::cout << "DM6\n";
 			//std::cout << "THREADER INIT\n";
 			// USE THREADER
 			// -----------------------------------------------------------------------------------
