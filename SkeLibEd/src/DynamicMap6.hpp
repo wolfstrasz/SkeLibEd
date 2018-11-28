@@ -161,7 +161,7 @@ public:
 		// Constructor
 		// -----------
 		DynamicMapImplementation(Elemental<EL> elemental) : elemental(elemental) {
-			this->nthreads = std::thread::hardware_concurrency();
+			this->nthreads = std::thread::hardware_concurrency()*2;
 			//this->sizeOfWork = 1000;
 		//	allThreads = new std::thread*[nthreads];
 			this->duration = 0.0f;
