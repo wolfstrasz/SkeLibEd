@@ -215,6 +215,7 @@ public:
 
 			size_t newJobSize = 0;
 			duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
+			std::cout << duration << "\n";
 			// analyse worksize
 			while (duration > 0.0f && newJobSize < input->size()) {
 				tstart = std::chrono::high_resolution_clock::now();
