@@ -185,7 +185,7 @@ public:
 			double meanTime = 0.0f;
 			size_t meanElements = 0;
 			size_t elementsCount = 0;
-			size_t elementsIndex = 0;
+			size_t elementIndex = 0;
 
 			// Scoreboard access analysis
 			// -------------------------------------------------------------------------------
@@ -193,7 +193,6 @@ public:
 			while (!((Scoreboard<IN, OUT>*)scoreboard)->scoreboardLock.try_lock());
 			if (((Scoreboard<IN, OUT>*)scoreboard)->isFinished) {
 				((Scoreboard<IN, OUT>*)scoreboard)->scoreboardLock.unlock();
-				break;
 			}
 			workTime = workTime / 1000000;
 			meanTime = workTime / elementsCount;
@@ -212,8 +211,10 @@ public:
 			// -------------------------------------------------------------------------------
 
 
+
+
 			size_t newJobSize = 0;
-			duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count()
+			duration = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count();
 			// analyse worksize
 			while (duration > 0.0f && newJobSize < input->size()) {
 				tstart = std::chrono::high_resolution_clock::now();
